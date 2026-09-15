@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GVC World Greece Pakistan — Visa Appointment Assistant</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="/app.css">
+</head>
+<body class="bg-gray-100 text-gray-900 font-sans antialiased min-h-screen">
+
+  <!-- Slot Open Notification Overlay -->
+  <div id="slotAlertBanner" class="hidden bg-emerald-600 text-white px-4 py-3 sticky top-0 z-50 shadow-md animate-bounce">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <i data-lucide="bell-ring" class="w-6 h-6 text-yellow-300"></i>
+        <div>
+          <h2 class="text-base font-bold">🎉 APPOINTMENT REGISTRATION OPEN NOW!</h2>
+          <p id="slotAlertDetails" class="text-xs text-emerald-100">Registration window is open for Pakistan applicants.</p>
+        </div>
+      </div>
+      <div class="flex items-center space-x-3">
+        <a href="https://www.gvcworld.eu/" target="_blank" class="px-4 py-1.5 rounded bg-white text-emerald-900 font-bold text-xs hover:bg-gray-100 transition shadow">
+          Apply On Official Portal Now →
+        </a>
+        <button onclick="dismissSlotAlert()" class="text-emerald-200 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Header Header Nav -->
+  <header class="bg-white border-b border-gray-200 sticky top-0 z-40 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        
+        <div class="flex items-center space-x-3">
+          <div class="w-9 h-9 rounded-lg bg-emerald-600 flex items-center justify-center text-white font-bold shadow-sm">
+            <i data-lucide="shield-check" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h1 class="text-base font-bold text-gray-900 leading-tight">GVC World Greece Pakistan</h1>
+            <p class="text-xs text-gray-500">Official Visa Appointment Assistant & Slot Alert System</p>
+          </div>
+        </div>
+
+        <div class="flex items-center space-x-2">
+          <!-- Audio Alert Sound Button -->
+          <button id="btnSoundToggle" onclick="toggleAudioAlert()" class="px-3 py-1.5 rounded-md bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium text-xs border border-gray-300 transition flex items-center gap-1.5">
+            <i data-lucide="volume-2" id="iconSound" class="w-3.5 h-3.5 text-emerald-600"></i>
+            <span id="textSound">Audio Alert: ON</span>
+          </button>
+
+          <!-- Simulate Alert Button -->
+          <button onclick="simulateSlotAlert()" class="px-3 py-1.5 rounded-md bg-amber-50 border border-amber-200 hover:bg-amber-100 text-amber-800 font-medium text-xs transition flex items-center gap-1">
+            <i data-lucide="bell" class="w-3.5 h-3.5"></i>
+            Test Sound Alert
+          </button>
+
+          <!-- Monitor Toggle Button -->
+          <button id="btnToggleAgent" onclick="toggleAgent()" class="px-3.5 py-2 rounded-md bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-xs shadow-sm transition flex items-center gap-1.5">
+            <i data-lucide="pause" id="iconToggleAgent" class="w-3.5 h-3.5"></i>
+            <span id="textToggleAgent">Pause Monitor</span>
+          </button>
+
+          <!-- Manual Check Button -->
+          <button onclick="triggerScan()" class="px-3.5 py-2 rounded-md bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium text-xs transition flex items-center gap-1.5">
+            <i data-lucide="refresh-cw" class="w-3.5 h-3.5 text-gray-500"></i>
+            <span>Check Now</span>
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Simplified Body -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+    <!-- 1. Primary Live Monitoring Banner & Schedule Card -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      
+      <!-- Primary Status Box -->
+      <div class="bg-white rounded-lg p-5 border border-gray-200 shadow-sm flex items-center justify-between md:col-span-2">
+        <div class="space-y-1">
+          <div class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Live System Status</div>
+          <div id="statPortalStatus" class="text-xl font-bold text-emerald-600 flex items-center gap-2">
+            MONITORING ACTIVE
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></span>
+          </div>
+          <p id="statPortalDetails" class="text-xs text-gray-500">Continuously watching GVC World Pakistan for open visa application slots...</p>
+        </div>
+
+        <div class="text-right shrink-0 space-y-1">
+          <div class="text-xs text-gray-500 font-medium">Next Automated Check:</div>
+          <div id="countdownTicker" class="text-lg font-bold font-mono text-emerald-700">01:59</div>
+          <a href="https://www.gvcworld.eu/" target="_blank" class="inline-flex items-center gap-1 text-xs font-bold text-emerald-600 hover:underline">
+            Official Gateway <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+          </a>
+        </div>
+      </div>
+
+      <!-- Prime Opening Window Box -->
+      <div class="bg-white rounded-lg p-5 border border-gray-200 shadow-sm space-y-1">
+        <div class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Next Expected Peak Window</div>
+        <div id="expectNextDate" class="text-base font-bold text-indigo-900">Tuesday, 09:00 AM PKT</div>
+        <p class="text-xs text-gray-500">Peak Days: <strong>Tuesday & Thursday (09:00 - 12:00 PKT)</strong></p>
+      </div>
+
+    </div>
+
+    <!-- 2. IMPERVA ERROR 17 PREVENTION GUIDE CARD (Non-Technical User Solution) -->
+    <div class="bg-amber-50 rounded-lg p-5 border border-amber-200 shadow-sm space-y-3">
+      <div class="flex items-center space-x-2">
+        <i data-lucide="alert-triangle" class="w-5 h-5 text-amber-600"></i>
+        <h2 class="text-base font-bold text-amber-900">How to Open the Portal Without "Error 17" Access Denied</h2>
+      </div>
+      
+      <p class="text-xs text-amber-800 leading-relaxed">
+        If you see <strong>"Error 17 - Access Denied"</strong> when clicking direct links, it is because GVC World's security firewall blocks direct visits to subdomains without main site security cookies. Follow these simple steps to open the portal cleanly:
+      </p>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs pt-1">
+        <div class="bg-white p-3 rounded-md border border-amber-200 space-y-1">
+          <div class="font-bold text-amber-900">Step 1: Click Official Gateway</div>
+          <p class="text-gray-600">Click the green button below to open <strong class="text-emerald-700">gvcworld.eu</strong> main site.</p>
+        </div>
+        <div class="bg-white p-3 rounded-md border border-amber-200 space-y-1">
+          <div class="font-bold text-amber-900">Step 2: Select Greece & Pakistan</div>
+          <p class="text-gray-600">Select <strong>"Greece"</strong> as destination and <strong>"Pakistan"</strong> as country.</p>
+        </div>
+        <div class="bg-white p-3 rounded-md border border-amber-200 space-y-1">
+          <div class="font-bold text-amber-900">Step 3: Enter Portal</div>
+          <p class="text-gray-600">The site will set security cookies and take you straight to the Pakistan booking portal.</p>
+        </div>
+      </div>
+
+      <div class="pt-2">
+        <a href="https://www.gvcworld.eu/" target="_blank" class="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-sm transition">
+          Open Official Gateway (gvcworld.eu)
+          <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+        </a>
+      </div>
+    </div>
+
+    <!-- 3. Detected Openings List -->
+    <div class="bg-white rounded-lg p-5 border border-gray-200 shadow-sm space-y-3">
+      <div class="flex items-center justify-between">
+        <h2 class="text-sm font-bold text-gray-900 uppercase tracking-wide flex items-center gap-2">
+          <i data-lucide="calendar-check-2" class="w-4 h-4 text-emerald-600"></i>
+          Detected Appointment Openings
+        </h2>
+        <span id="badgeSlotCount" class="text-xs font-semibold px-2.5 py-0.5 bg-gray-100 text-gray-700 rounded">0 Openings</span>
+      </div>
+
+      <div id="slotsContainer" class="space-y-2">
+        <div class="text-xs text-gray-500 text-center py-6 border border-dashed border-gray-200 rounded-md">
+          No open registration windows detected yet. The monitoring agent is actively watching for updates.
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. Applicants Queue Card -->
+    <div class="bg-white rounded-lg p-5 border border-gray-200 shadow-sm space-y-4">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-sm font-bold text-gray-900 uppercase tracking-wide flex items-center gap-2">
+            <i data-lucide="users" class="w-4 h-4 text-gray-700"></i>
+            Applicant Queue
+          </h2>
+          <p class="text-xs text-gray-500">Save applicant details here for 1-click copy when slots open.</p>
+        </div>
+        <button onclick="openApplicantModal()" class="px-3.5 py-2 rounded-md bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-xs transition flex items-center gap-1">
+          <i data-lucide="user-plus" class="w-3.5 h-3.5"></i>
+          Add Applicant
+        </button>
+      </div>
+
+      <div id="applicantsContainer" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Add Applicant Modal -->
+  <div id="applicantModal" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white border border-gray-200 rounded-lg max-w-md w-full p-6 space-y-4 shadow-xl relative">
+      <div class="flex items-center justify-between pb-3 border-b border-gray-200">
+        <h3 class="text-base font-bold text-gray-900 flex items-center gap-2">
+          <i data-lucide="user-plus" class="w-4 h-4 text-emerald-600"></i>
+          Add Applicant Profile
+        </h3>
+        <button onclick="closeApplicantModal()" class="text-gray-400 hover:text-gray-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+
+      <form id="formApplicant" onsubmit="saveApplicant(event)" class="space-y-3">
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-medium text-gray-700 mb-1">Given Name *</label>
+            <input type="text" id="inputGivenName" required placeholder="e.g. Muhammad" class="input-field">
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-gray-700 mb-1">Surname *</label>
+            <input type="text" id="inputSurname" required placeholder="e.g. Ali" class="input-field">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-medium text-gray-700 mb-1">Passport Number *</label>
+            <input type="text" id="inputPassportNumber" required placeholder="e.g. ED1234567" class="input-field uppercase">
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-gray-700 mb-1">Passport Expiry</label>
+            <input type="date" id="inputPassportExpiry" value="2030-01-01" class="input-field">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-medium text-gray-700 mb-1">Visa Application Centre *</label>
+            <select id="selectVac" class="input-field">
+              <option value="Islamabad VAC">Islamabad VAC</option>
+              <option value="Lahore VAC">Lahore VAC</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-gray-700 mb-1">Visa Category *</label>
+            <select id="selectCategory" class="input-field">
+              <option value="Schengen Short Stay (Type C)">Schengen Short Stay (Type C)</option>
+              <option value="National Long Stay (Type D)">National Long Stay (Type D)</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-gray-700 mb-1">Mobile Phone (Optional)</label>
+          <input type="tel" id="inputPhone" placeholder="+923001234567" class="input-field">
+        </div>
+
+        <div class="pt-2 flex justify-end space-x-2">
+          <button type="button" onclick="closeApplicantModal()" class="px-3.5 py-1.5 text-xs font-medium text-gray-600 hover:text-gray-800">Cancel</button>
+          <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-1.5 rounded-md text-xs font-semibold shadow-sm">Save Profile</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>

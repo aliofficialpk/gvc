@@ -1,0 +1,251 @@
+{
+  "portal_metadata": {
+    "name": "GVC World Greece Pakistan Visa Appointment System",
+    "starting_url": "https://pk-gr-services.gvcworld.eu/login/PK/en?lang=en_US",
+    "country_origin": "PK",
+    "country_destination": "GR",
+    "waf_protection": "Imperva Incapsula WAF",
+    "waf_cookies": ["visid_incap_3343172", "incap_ses_7754_3343172", "___utmvc"]
+  },
+  "workflow_steps": [
+    {
+      "step_index": 1,
+      "step_id": "STEP_ENTRY_PORTAL",
+      "name": "Portal Entry & Country Selection",
+      "url": "https://www.gvcworld.eu/",
+      "method": "GET",
+      "purpose": "Select destination (Greece) and country of residence (Pakistan).",
+      "page_elements": {
+        "destination_dropdown": { "id": "edit-gvcw-greece", "value": "2" },
+        "residence_dropdown": { "id": "gvcw_countries", "value": "29" }
+      },
+      "navigation": {
+        "redirect_url": "https://pk-gr-services.gvcworld.eu/login/PK/en?lang=en_US",
+        "action": "Select Pakistan -> Redirect to Pakistan GVC Portal"
+      }
+    },
+    {
+      "step_index": 2,
+      "step_id": "STEP_WAF_CHALLENGE",
+      "name": "Imperva Incapsula Perimeter Verification",
+      "url": "https://pk-gr-services.gvcworld.eu/login/PK/en?lang=en_US",
+      "method": "GET",
+      "purpose": "Client-side Javascript & Cookie challenge verification.",
+      "security_mechanisms": [
+        "Incapsula JS Challenge execution",
+        "Setting session cookies (incap_ses, visid_incap)",
+        "Browser fingerprinting & WebDriver detection"
+      ],
+      "failure_behavior": "HTTP 403 Forbidden with Incapsula error iframe if browser environment is deemed automated/bot."
+    },
+    {
+      "step_index": 3,
+      "step_id": "STEP_LOGIN",
+      "name": "User Authentication & Login",
+      "url": "https://pk-gr-services.gvcworld.eu/login/PK/en?lang=en_US",
+      "method": "POST",
+      "purpose": "Authenticate genuine applicant or main account user.",
+      "form_fields": [
+        {
+          "name": "email",
+          "label": "Email Address",
+          "type": "email",
+          "required": true,
+          "format": "email_address",
+          "validation": "Standard RFC 5322 regex validation"
+        },
+        {
+          "name": "password",
+          "label": "Password",
+          "type": "password",
+          "required": true,
+          "format": "string",
+          "validation": "Min 8 chars, uppercase, lowercase, number, special char"
+        },
+        {
+          "name": "captcha_token",
+          "label": "Security CAPTCHA",
+          "type": "captcha",
+          "required": true,
+          "format": "token",
+          "validation": "Server-side reCAPTCHA / hCaptcha token verification"
+        }
+      ],
+      "actions": {
+        "submit_button": "Login / Sign In",
+        "forgot_password_link": "Forgot Password?",
+        "register_link": "Register / Create Account"
+      },
+      "verification": {
+        "mfa_required": true,
+        "type": "Email OTP or SMS Verification Code",
+        "ttl_seconds": 300
+      },
+      "navigation": {
+        "on_success": "Applicant Dashboard (/dashboard)",
+        "on_failure": "Display inline validation error or CAPTCHA reset"
+      }
+    },
+    {
+      "step_index": 4,
+      "step_id": "STEP_REGISTRATION",
+      "name": "Account Registration (If New User)",
+      "url": "https://pk-gr-services.gvcworld.eu/register/PK/en",
+      "method": "POST",
+      "purpose": "Register a new genuine applicant account.",
+      "form_fields": [
+        { "name": "first_name", "label": "First Name", "type": "text", "required": true },
+        { "name": "last_name", "label": "Last Name", "type": "text", "required": true },
+        { "name": "email", "label": "Email Address", "type": "email", "required": true },
+        { "name": "phone", "label": "Phone Number", "type": "tel", "required": true, "format": "+923XXXXXXXXX" },
+        { "name": "password", "label": "Password", "type": "password", "required": true },
+        { "name": "confirm_password", "label": "Confirm Password", "type": "password", "required": true }
+      ],
+      "verification": {
+        "type": "Mandatory Email Activation Link & SMS OTP",
+        "action": "Click activation link in email before login is allowed"
+      }
+    },
+    {
+      "step_index": 5,
+      "step_id": "STEP_DASHBOARD",
+      "name": "Applicant Dashboard",
+      "url": "https://pk-gr-services.gvcworld.eu/dashboard",
+      "purpose": "Overview of existing applications, active appointments, and profile management.",
+      "navigation_links": [
+        { "name": "Book New Appointment", "target_step": "STEP_CENTRE_VISA_SELECTION" },
+        { "name": "Manage Applicants", "target_step": "STEP_APPLICANT_DETAILS" },
+        { "name": "View Appointment History", "target_step": "STEP_HISTORY" },
+        { "name": "Account Settings / Profile", "target_step": "STEP_PROFILE" }
+      ]
+    },
+    {
+      "step_index": 6,
+      "step_id": "STEP_CENTRE_VISA_SELECTION",
+      "name": "Visa Category & Centre Selection",
+      "url": "https://pk-gr-services.gvcworld.eu/appointment/select-centre",
+      "purpose": "Select Visa Application Centre (VAC) and Visa Category.",
+      "form_fields": [
+        {
+          "name": "centre_id",
+          "label": "Visa Application Centre",
+          "type": "select",
+          "required": true,
+          "options": [
+            { "id": "ISB", "label": "Islamabad Visa Application Centre" },
+            { "id": "LHR", "label": "Lahore Visa Application Centre" }
+          ]
+        },
+        {
+          "name": "visa_type",
+          "label": "Visa Type / Category",
+          "type": "select",
+          "required": true,
+          "options": [
+            { "id": "SCHENGEN_C", "label": "Schengen Short Stay (Type C)" },
+            { "id": "NATIONAL_D", "label": "National Long Stay (Type D)" },
+            { "id": "BUSINESS", "label": "Business / Official" },
+            { "id": "FAMILY_VISIT", "label": "Family Visit / Tourism" }
+          ]
+        },
+        {
+          "name": "sub_category",
+          "label": "Sub-Category",
+          "type": "select",
+          "required": true
+        }
+      ],
+      "navigation": {
+        "on_submit": "STEP_APPLICANT_DETAILS"
+      }
+    },
+    {
+      "step_index": 7,
+      "step_id": "STEP_APPLICANT_DETAILS",
+      "name": "Applicant Information Entry",
+      "url": "https://pk-gr-services.gvcworld.eu/appointment/applicant-info",
+      "purpose": "Enter or select genuine applicant profile information.",
+      "supports_group_booking": true,
+      "max_applicants_per_booking": 5,
+      "form_fields": [
+        { "name": "given_name", "label": "Given Name(s)", "type": "text", "required": true, "format": "Capitalized text as in passport" },
+        { "name": "surname", "label": "Surname", "type": "text", "required": true, "format": "Capitalized text as in passport" },
+        { "name": "dob", "label": "Date of Birth", "type": "date", "required": true, "format": "YYYY-MM-DD" },
+        { "name": "gender", "label": "Gender", "type": "select", "required": true, "options": ["Male", "Female", "Other"] },
+        { "name": "nationality", "label": "Nationality", "type": "select", "required": true, "default": "Pakistan" },
+        { "name": "passport_number", "label": "Passport Number", "type": "text", "required": true, "format": "[A-Z0-9]{8,9}" },
+        { "name": "passport_expiry", "label": "Passport Expiry Date", "type": "date", "required": true, "format": "YYYY-MM-DD" },
+        { "name": "email", "label": "Applicant Email", "type": "email", "required": true },
+        { "name": "mobile", "label": "Mobile Phone Number", "type": "tel", "required": true, "format": "+923XXXXXXXXX" }
+      ],
+      "navigation": {
+        "on_submit": "STEP_DOCUMENT_UPLOAD"
+      }
+    },
+    {
+      "step_index": 8,
+      "step_id": "STEP_DOCUMENT_UPLOAD",
+      "name": "Document Pre-Upload (If Mandatory)",
+      "url": "https://pk-gr-services.gvcworld.eu/appointment/documents",
+      "purpose": "Upload scanned copy of applicant passport bio-page and application form.",
+      "documents": [
+        {
+          "name": "passport_bio_page",
+          "label": "Passport Bio Page",
+          "required": true,
+          "formats": ["PDF", "JPEG", "PNG"],
+          "max_size_mb": 2.0
+        },
+        {
+          "name": "visa_application_form",
+          "label": "Signed Visa Application Form",
+          "required": false,
+          "formats": ["PDF"],
+          "max_size_mb": 5.0
+        }
+      ],
+      "navigation": {
+        "on_submit": "STEP_CALENDAR_SLOT_SELECTION"
+      }
+    },
+    {
+      "step_index": 9,
+      "step_id": "STEP_CALENDAR_SLOT_SELECTION",
+      "name": "Appointment Date & Time Slot Selection",
+      "url": "https://pk-gr-services.gvcworld.eu/appointment/select-slot",
+      "purpose": "View available dates, select appointment date, and pick time slot.",
+      "calendar_states": {
+        "available_date": "Highlighted green/blue cell. Clickable. Triggers time slot fetch.",
+        "disabled_date": "Grayed out cell. Non-clickable. (Weekends, holidays, fully booked).",
+        "fully_booked": "Message banner displayed: 'No slots available for the selected month/category.'",
+        "available_time_slots": "Radio buttons or grid cards (e.g., 09:00 AM, 09:30 AM, 11:00 AM)."
+      },
+      "monitoring_indicators": {
+        "api_endpoint": "GET /api/appointment/available-slots?centre={centre_id}&category={category_id}&year={YYYY}&month={MM}",
+        "success_condition": "response.availableSlots.length > 0"
+      },
+      "navigation": {
+        "on_select_slot": "STEP_REVIEW_CONFIRMATION"
+      }
+    },
+    {
+      "step_index": 10,
+      "step_id": "STEP_REVIEW_CONFIRMATION",
+      "name": "Review & Appointment Confirmation",
+      "url": "https://pk-gr-services.gvcworld.eu/appointment/review",
+      "purpose": "Review applicant details, appointment date, time, and centre before final confirmation.",
+      "verification": {
+        "final_captcha_or_otp": "May present SMS/Email OTP or CAPTCHA before final slot lock."
+      },
+      "actions": {
+        "confirm_booking_button": "Confirm Appointment",
+        "cancel_button": "Cancel / Return to Dashboard"
+      },
+      "outputs": [
+        "Appointment Confirmation Reference Number (e.g. GVC-PK-GR-2026XXXX)",
+        "Downloadable Appointment Receipt PDF with QR Code",
+        "Automated Confirmation Email sent to genuine applicant"
+      ]
+    }
+  ]
+}
