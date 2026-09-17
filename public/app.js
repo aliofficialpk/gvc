@@ -1,12 +1,15 @@
-// Simplified Non-Technical Client Controller
+// Dynamic Visa Appointment Assistant & Auto-Apply Client Controller
 
 let state = {
+  activeTab: 'monitor',
   isMonitoring: false,
   checkIntervalSeconds: 120,
   scanCount: 0,
   lastCheck: null,
   detectedSlots: [],
   applicants: [],
+  history: [],
+  formSchema: null,
   soundEnabled: true,
   audioCtx: null,
   countdownSeconds: 120
@@ -26,6 +29,43 @@ document.addEventListener('DOMContentLoaded', () => {
   refreshAll();
   setInterval(refreshAll, 5000);
 });
+
+function switchTab(tabName) {
+  state.activeTab = tabName;
+
+  const btnMonitor = document.getElementById('navTabMonitor');
+  const btnApplicants = document.getElementById('navTabApplicants');
+  const btnHistory = document.getElementById('navTabHistory');
+
+  const panelMonitor = document.getElementById('panelMonitor');
+  const panelApplicants = document.getElementById('panelApplicants');
+  const panelHistory = document.getElementById('panelHistory');
+
+  if (panelMonitor) panelMonitor.classList.add('hidden');
+  if (panelApplicants) panelApplicants.classList.add('hidden');
+  if (panelHistory) panelHistory.classList.add('hidden');
+
+  const activeClass = 'tab-btn active border-b-2 border-emerald-600 text-emerald-700 py-3.5 px-1 font-semibold text-xs flex items-center gap-2';
+  const inactiveClass = 'tab-btn border-b-2 border-transparent text-gray-500 hover:text-gray-700 py-3.5 px-1 font-medium text-xs flex items-center gap-2';
+
+  if (btnMonitor) btnMonitor.className = inactiveClass;
+  if (btnApplicants) btnApplicants.className = inactiveClass;
+  if (btnHistory) btnHistory.className = inactiveClass;
+
+  if (tabName === 'monitor') {
+    if (panelMonitor) panelMonitor.classList.remove('hidden');
+    if (btnMonitor) btnMonitor.className = activeClass;
+  } else if (tabName === 'applicants') {
+    if (panelApplicants) panelApplicants.classList.remove('hidden');
+    if (btnApplicants) btnApplicants.className = activeClass;
+  } else if (tabName === 'history') {
+    if (panelHistory) panelHistory.classList.remove('hidden');
+    if (btnHistory) btnHistory.className = activeClass;
+    fetchHistory();
+  }
+
+  if (window.lucide) lucide.createIcons();
+}
 
 function updateClock() {
   const now = new Date();
@@ -73,6 +113,12 @@ function initEventStream() {
     evtSource.addEventListener('applicants', (e) => {
       state.applicants = JSON.parse(e.data);
       renderApplicants(state.applicants);
+    });
+
+    evtSource.addEventListener('application_submitted', (e) => {
+      const entry = JSON.parse(e.data);
+      state.history.unshift(entry);
+      renderHistory(state.history);
     });
 
   } catch(err) {
@@ -156,7 +202,9 @@ async function refreshAll() {
   await Promise.all([
     fetchStatus(),
     fetchApplicants(),
-    fetchSlots()
+    fetchSlots(),
+    fetchFormSchema(),
+    fetchHistory()
   ]);
 }
 
@@ -185,9 +233,6 @@ function updateUIStatus(data) {
     if (text) text.innerText = 'Resume Monitor';
     if (icon) icon.setAttribute('data-lucide', 'play');
   }
-
-  const scanCountEl = document.getElementById('statScanCount');
-  if (scanCountEl) scanCountEl.innerText = `${data.scanCount || state.scanCount} checks completed`;
 
   const portalStat = document.getElementById('statPortalStatus');
   const portalDet = document.getElementById('statPortalDetails');
@@ -218,6 +263,40 @@ function updateUIStatus(data) {
   if (window.lucide) lucide.createIcons();
 }
 
+async function fetchFormSchema() {
+  try {
+    const res = await fetch('/api/scraped-form-schema');
+    const data = await res.json();
+    state.formSchema = data;
+    renderFormSchema(data);
+  } catch(e) {}
+}
+
+function renderFormSchema(schema) {
+  const container = document.getElementById('formSchemaContainer');
+  const badge = document.getElementById('badgeFieldsCount');
+  if (!container || !schema) return;
+
+  if (badge) badge.innerText = `${schema.fieldsCount} Form Fields Detected`;
+
+  container.innerHTML = schema.fields.map(f => `
+    <div class="p-3 rounded-md bg-gray-50 border border-gray-200 space-y-1 hover:border-emerald-300 transition">
+      <div class="flex items-center justify-between">
+        <span class="font-bold text-gray-900 text-xs">${escapeHtml(f.label)}</span>
+        ${f.required ? '<span class="text-[10px] bg-amber-100 text-amber-800 font-bold px-1.5 py-0.5 rounded">REQUIRED</span>' : '<span class="text-[10px] bg-gray-200 text-gray-600 px-1.5 py-0.5 rounded">OPTIONAL</span>'}
+      </div>
+      <div class="text-[11px] font-mono text-emerald-700 font-semibold truncate">
+        Key: ${escapeHtml(f.fieldKey)}
+      </div>
+      <div class="text-[10px] text-gray-500 font-mono truncate" title="${escapeHtml(f.gvcSelector)}">
+        Selector: ${escapeHtml(f.gvcSelector)}
+      </div>
+    </div>
+  `).join('');
+
+  if (window.lucide) lucide.createIcons();
+}
+
 async function fetchApplicants() {
   try {
     const res = await fetch('/api/applicants');
@@ -229,42 +308,180 @@ async function fetchApplicants() {
 
 function renderApplicants(list) {
   const container = document.getElementById('applicantsContainer');
+  const badge = document.getElementById('badgeApplicantCount');
   if (!container) return;
+
+  if (badge) badge.innerText = list.length;
 
   if (list.length === 0) {
     container.innerHTML = `
-      <div class="col-span-full text-xs text-gray-500 text-center py-6 border border-dashed border-gray-200 rounded-lg bg-gray-50">
-        No applicants added yet. Click <strong>"Add Applicant"</strong> to save a profile.
+      <div class="col-span-full text-xs text-gray-500 text-center py-8 border border-dashed border-gray-200 rounded-lg bg-gray-50 space-y-2">
+        <p>No applicant profiles created yet.</p>
+        <button onclick="seedDemoProfiles()" class="px-3 py-1.5 bg-indigo-600 text-white rounded text-xs font-bold shadow-sm hover:bg-indigo-700 transition">
+          ✨ Seed Demo Profiles (1-Click Test)
+        </button>
       </div>
     `;
     return;
   }
 
   container.innerHTML = list.map(a => `
-    <div class="p-3.5 rounded-lg bg-white border border-gray-200 shadow-sm flex items-center justify-between hover:border-gray-300 transition">
-      <div class="space-y-1">
+    <div class="p-4 rounded-lg bg-white border border-gray-200 shadow-sm space-y-3 hover:border-gray-300 transition">
+      <div class="flex items-center justify-between border-b border-gray-100 pb-2">
         <div class="font-bold text-gray-900 text-sm flex items-center gap-1.5">
-          <i data-lucide="user" class="w-3.5 h-3.5 text-emerald-600"></i>
+          <i data-lucide="user-check" class="w-4 h-4 text-emerald-600"></i>
           ${escapeHtml(a.givenName)} ${escapeHtml(a.surname)}
         </div>
-        <div class="text-xs text-gray-600 font-mono">
-          Pass: <strong class="text-gray-900">${escapeHtml(a.passportNumber)}</strong> • VAC: <strong class="text-emerald-700">${escapeHtml(a.vac)}</strong>
-        </div>
-        <div class="text-[11px] text-gray-500">Category: ${escapeHtml(a.category)}</div>
+        <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800">${escapeHtml(a.status || 'Active')}</span>
       </div>
-      <div class="flex items-center space-x-1.5">
-        <button onclick="copyApplicantInfo('${a.id}')" class="px-2.5 py-1 rounded bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-medium transition border border-gray-300 flex items-center gap-1" title="Copy Applicant Details">
-          <i data-lucide="copy" class="w-3 h-3 text-gray-500"></i>
-          <span>Copy</span>
+
+      <div class="grid grid-cols-2 gap-2 text-xs">
+        <div>
+          <span class="text-gray-500">Passport:</span>
+          <div class="font-mono font-bold text-gray-900">${escapeHtml(a.passportNumber)}</div>
+        </div>
+        <div>
+          <span class="text-gray-500">VAC:</span>
+          <div class="font-bold text-emerald-700">${escapeHtml(a.vac)}</div>
+        </div>
+        <div>
+          <span class="text-gray-500">Category:</span>
+          <div class="text-gray-800 truncate">${escapeHtml(a.category)}</div>
+        </div>
+        <div>
+          <span class="text-gray-500">Expiry:</span>
+          <div class="font-mono text-gray-700">${escapeHtml(a.passportExpiry)}</div>
+        </div>
+      </div>
+
+      <div class="pt-2 border-t border-gray-100 flex items-center justify-between">
+        <button onclick="triggerAutoApply('${a.id}')" class="px-3 py-1.5 rounded-md bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-sm transition flex items-center gap-1">
+          <i data-lucide="zap" class="w-3.5 h-3.5"></i>
+          Auto-Apply Test Run
         </button>
-        <button onclick="deleteApplicant('${a.id}')" class="p-1 rounded text-gray-400 hover:text-rose-600 transition" title="Delete">
-          <i data-lucide="trash-2" class="w-4 h-4"></i>
-        </button>
+
+        <div class="flex items-center space-x-1">
+          <button onclick="copyApplicantInfo('${a.id}')" class="px-2.5 py-1 rounded bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-medium transition border border-gray-300 flex items-center gap-1">
+            <i data-lucide="copy" class="w-3 h-3 text-gray-500"></i>
+            <span>Copy</span>
+          </button>
+          <button onclick="deleteApplicant('${a.id}')" class="p-1 rounded text-gray-400 hover:text-rose-600 transition" title="Delete">
+            <i data-lucide="trash-2" class="w-4 h-4"></i>
+          </button>
+        </div>
       </div>
     </div>
   `).join('');
 
   if (window.lucide) lucide.createIcons();
+}
+
+async function seedDemoProfiles() {
+  try {
+    const res = await fetch('/api/applicants/seed-demo', { method: 'POST' });
+    const data = await res.json();
+    if (data.success) {
+      refreshAll();
+      alert('✅ Demo applicant profiles successfully created!');
+    }
+  } catch(e) {
+    alert('Failed to seed demo profiles');
+  }
+}
+
+async function triggerAutoApply(applicantId) {
+  try {
+    const res = await fetch('/api/applications/apply', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ applicantId, slotId: 'SLOT-AUTO-TEST' })
+    });
+    const data = await res.json();
+    if (data.success) {
+      alert(`🎉 AUTO-APPLY SUCCESS!\n\nPre-filled profile for ${data.application.applicant_name} (${data.application.vac}).\nMatch Rate: ${data.application.autofill_match_rate}%\n\nApplication saved to Application History log!`);
+      switchTab('history');
+      refreshAll();
+    } else {
+      alert('Error during auto-apply: ' + (data.error || 'Unknown'));
+    }
+  } catch(e) {
+    alert('Failed to run auto-apply: ' + e.message);
+  }
+}
+
+async function fetchHistory() {
+  try {
+    const res = await fetch('/api/applications/history');
+    const data = await res.json();
+    state.history = data.history || [];
+    renderHistory(state.history);
+  } catch(e) {}
+}
+
+function renderHistory(list) {
+  const container = document.getElementById('historyTableBody');
+  const badge = document.getElementById('badgeHistoryCount');
+  if (!container) return;
+
+  if (badge) badge.innerText = list.length;
+
+  if (list.length === 0) {
+    container.innerHTML = `
+      <tr>
+        <td colspan="8" class="text-center py-8 text-gray-500 bg-gray-50 border-b border-gray-200">
+          No applications recorded yet. Go to <strong>"Applicants & Auto-Apply Profiles"</strong> tab and click <strong>"Auto-Apply Test Run"</strong>!
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  container.innerHTML = list.map(h => `
+    <tr class="hover:bg-gray-50 transition">
+      <td class="p-3 font-mono font-bold text-gray-900">${escapeHtml(h.id)}</td>
+      <td class="p-3 font-semibold text-gray-900">${escapeHtml(h.applicant_name)}</td>
+      <td class="p-3 font-mono text-gray-700">${escapeHtml(h.passport_number)}</td>
+      <td class="p-3">
+        <div class="font-bold text-emerald-700">${escapeHtml(h.vac)}</div>
+        <div class="text-[10px] text-gray-500">${escapeHtml(h.category)}</div>
+      </td>
+      <td class="p-3">
+        <span class="px-2 py-0.5 rounded text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
+          ${h.autofill_match_rate}% Matched
+        </span>
+      </td>
+      <td class="p-3">
+        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-600 text-white uppercase tracking-wider">
+          ${escapeHtml(h.status)}
+        </span>
+      </td>
+      <td class="p-3 text-gray-500 font-mono text-[11px]">
+        ${new Date(h.applied_at).toLocaleString()}
+      </td>
+      <td class="p-3 text-right">
+        <button onclick="deleteHistoryItem('${h.id}')" class="text-gray-400 hover:text-rose-600 p-1 transition" title="Delete Log">
+          <i data-lucide="trash-2" class="w-4 h-4"></i>
+        </button>
+      </td>
+    </tr>
+  `).join('');
+
+  if (window.lucide) lucide.createIcons();
+}
+
+async function refreshHistory() {
+  await fetchHistory();
+}
+
+async function clearHistory() {
+  if (!confirm('Are you sure you want to clear all application submission history logs?')) return;
+  await fetch('/api/applications/history', { method: 'DELETE' });
+  refreshHistory();
+}
+
+async function deleteHistoryItem(id) {
+  await fetch(`/api/applications/history/${id}`, { method: 'DELETE' });
+  refreshHistory();
 }
 
 async function fetchSlots() {

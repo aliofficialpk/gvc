@@ -91,111 +91,213 @@
     </div>
   </header>
 
-  <!-- Main Simplified Body -->
+  <!-- Navigation Sub-Header Tabs -->
+  <nav class="bg-white border-b border-gray-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex space-x-8">
+        <button id="navTabMonitor" onclick="switchTab('monitor')" class="tab-btn active border-b-2 border-emerald-600 text-emerald-700 py-3.5 px-1 font-semibold text-xs flex items-center gap-2">
+          <i data-lucide="activity" class="w-4 h-4"></i>
+          Live Monitor & Scraped Form Inspector
+        </button>
+        <button id="navTabApplicants" onclick="switchTab('applicants')" class="tab-btn border-b-2 border-transparent text-gray-500 hover:text-gray-700 py-3.5 px-1 font-medium text-xs flex items-center gap-2">
+          <i data-lucide="users" class="w-4 h-4"></i>
+          Applicants & Auto-Apply Profiles
+          <span id="badgeApplicantCount" class="ml-1 bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full text-[10px] font-bold">0</span>
+        </button>
+        <button id="navTabHistory" onclick="switchTab('history')" class="tab-btn border-b-2 border-transparent text-gray-500 hover:text-gray-700 py-3.5 px-1 font-medium text-xs flex items-center gap-2">
+          <i data-lucide="history" class="w-4 h-4"></i>
+          Application History & Status Tracker
+          <span id="badgeHistoryCount" class="ml-1 bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full text-[10px] font-bold">0</span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Body Container -->
   <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
 
-    <!-- 1. Primary Live Monitoring Banner & Schedule Card -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-      
-      <!-- Primary Status Box -->
-      <div class="bg-white rounded-lg p-5 border border-gray-200 shadow-sm flex items-center justify-between md:col-span-2">
-        <div class="space-y-1">
-          <div class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Live System Status</div>
-          <div id="statPortalStatus" class="text-xl font-bold text-emerald-600 flex items-center gap-2">
-            MONITORING ACTIVE
-            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></span>
+    <!-- TAB 1: LIVE MONITOR & DYNAMIC FORM INSPECTOR -->
+    <div id="panelMonitor" class="space-y-6">
+
+      <!-- 1. Primary Live Monitoring Banner & Schedule Card -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <!-- Primary Status Box -->
+        <div class="bg-white rounded-lg p-5 border border-gray-200 shadow-sm flex items-center justify-between md:col-span-2">
+          <div class="space-y-1">
+            <div class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Live System Status</div>
+            <div id="statPortalStatus" class="text-xl font-bold text-emerald-600 flex items-center gap-2">
+              MONITORING ACTIVE
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></span>
+            </div>
+            <p id="statPortalDetails" class="text-xs text-gray-500">Continuously watching GVC World Pakistan for open visa application slots...</p>
           </div>
-          <p id="statPortalDetails" class="text-xs text-gray-500">Continuously watching GVC World Pakistan for open visa application slots...</p>
+
+          <div class="text-right shrink-0 space-y-1">
+            <div class="text-xs text-gray-500 font-medium">Next Automated Check:</div>
+            <div id="countdownTicker" class="text-lg font-bold font-mono text-emerald-700">01:59</div>
+            <a href="https://www.gvcworld.eu/" target="_blank" class="inline-flex items-center gap-1 text-xs font-bold text-emerald-600 hover:underline">
+              Official Gateway <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+            </a>
+          </div>
         </div>
 
-        <div class="text-right shrink-0 space-y-1">
-          <div class="text-xs text-gray-500 font-medium">Next Automated Check:</div>
-          <div id="countdownTicker" class="text-lg font-bold font-mono text-emerald-700">01:59</div>
-          <a href="https://www.gvcworld.eu/" target="_blank" class="inline-flex items-center gap-1 text-xs font-bold text-emerald-600 hover:underline">
-            Official Gateway <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+        <!-- Prime Opening Window Box -->
+        <div class="bg-white rounded-lg p-5 border border-gray-200 shadow-sm space-y-1">
+          <div class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Next Expected Peak Window</div>
+          <div id="expectNextDate" class="text-base font-bold text-indigo-900">Tuesday, 09:00 AM PKT</div>
+          <p class="text-xs text-gray-500">Peak Days: <strong>Tuesday & Thursday (09:00 - 12:00 PKT)</strong></p>
+        </div>
+      </div>
+
+      <!-- 2. IMPERVA ERROR 17 PREVENTION GUIDE CARD -->
+      <div class="bg-amber-50 rounded-lg p-5 border border-amber-200 shadow-sm space-y-3">
+        <div class="flex items-center space-x-2">
+          <i data-lucide="alert-triangle" class="w-5 h-5 text-amber-600"></i>
+          <h2 class="text-base font-bold text-amber-900">How to Open the Portal Without "Error 17" Access Denied</h2>
+        </div>
+        
+        <p class="text-xs text-amber-800 leading-relaxed">
+          If you see <strong>"Error 17 - Access Denied"</strong> when clicking direct links, GVC World firewall requires main site security cookies. Follow these steps:
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs pt-1">
+          <div class="bg-white p-3 rounded-md border border-amber-200 space-y-1">
+            <div class="font-bold text-amber-900">Step 1: Click Official Gateway</div>
+            <p class="text-gray-600">Click below to open <strong class="text-emerald-700">gvcworld.eu</strong> main site.</p>
+          </div>
+          <div class="bg-white p-3 rounded-md border border-amber-200 space-y-1">
+            <div class="font-bold text-amber-900">Step 2: Select Greece & Pakistan</div>
+            <p class="text-gray-600">Select <strong>"Greece"</strong> destination and <strong>"Pakistan"</strong> country.</p>
+          </div>
+          <div class="bg-white p-3 rounded-md border border-amber-200 space-y-1">
+            <div class="font-bold text-amber-900">Step 3: Enter Portal</div>
+            <p class="text-gray-600">Cookies will be set and you will land cleanly on the Pakistan booking portal.</p>
+          </div>
+        </div>
+
+        <div class="pt-2">
+          <a href="https://www.gvcworld.eu/" target="_blank" class="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-sm transition">
+            Open Official Gateway (gvcworld.eu)
+            <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
           </a>
         </div>
       </div>
 
-      <!-- Prime Opening Window Box -->
-      <div class="bg-white rounded-lg p-5 border border-gray-200 shadow-sm space-y-1">
-        <div class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Next Expected Peak Window</div>
-        <div id="expectNextDate" class="text-base font-bold text-indigo-900">Tuesday, 09:00 AM PKT</div>
-        <p class="text-xs text-gray-500">Peak Days: <strong>Tuesday & Thursday (09:00 - 12:00 PKT)</strong></p>
-      </div>
-
-    </div>
-
-    <!-- 2. IMPERVA ERROR 17 PREVENTION GUIDE CARD (Non-Technical User Solution) -->
-    <div class="bg-amber-50 rounded-lg p-5 border border-amber-200 shadow-sm space-y-3">
-      <div class="flex items-center space-x-2">
-        <i data-lucide="alert-triangle" class="w-5 h-5 text-amber-600"></i>
-        <h2 class="text-base font-bold text-amber-900">How to Open the Portal Without "Error 17" Access Denied</h2>
-      </div>
-      
-      <p class="text-xs text-amber-800 leading-relaxed">
-        If you see <strong>"Error 17 - Access Denied"</strong> when clicking direct links, it is because GVC World's security firewall blocks direct visits to subdomains without main site security cookies. Follow these simple steps to open the portal cleanly:
-      </p>
-
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs pt-1">
-        <div class="bg-white p-3 rounded-md border border-amber-200 space-y-1">
-          <div class="font-bold text-amber-900">Step 1: Click Official Gateway</div>
-          <p class="text-gray-600">Click the green button below to open <strong class="text-emerald-700">gvcworld.eu</strong> main site.</p>
+      <!-- 3. DYNAMICALLY SCRAPED GVC FORM SCHEMA INSPECTOR -->
+      <div class="bg-white rounded-lg p-5 border border-gray-200 shadow-sm space-y-4">
+        <div class="flex items-center justify-between border-b border-gray-100 pb-3">
+          <div>
+            <h2 class="text-sm font-bold text-gray-900 uppercase tracking-wide flex items-center gap-2">
+              <i data-lucide="file-text" class="w-4 h-4 text-emerald-600"></i>
+              Dynamically Scraped GVC Registration Form Fields
+            </h2>
+            <p class="text-xs text-gray-500">Real-time DOM analysis of input fields required by GVC World Greece Pakistan registration portal.</p>
+          </div>
+          <span id="badgeFieldsCount" class="text-xs font-semibold px-2.5 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full">
+            9 Form Fields Detected
+          </span>
         </div>
-        <div class="bg-white p-3 rounded-md border border-amber-200 space-y-1">
-          <div class="font-bold text-amber-900">Step 2: Select Greece & Pakistan</div>
-          <p class="text-gray-600">Select <strong>"Greece"</strong> as destination and <strong>"Pakistan"</strong> as country.</p>
-        </div>
-        <div class="bg-white p-3 rounded-md border border-amber-200 space-y-1">
-          <div class="font-bold text-amber-900">Step 3: Enter Portal</div>
-          <p class="text-gray-600">The site will set security cookies and take you straight to the Pakistan booking portal.</p>
+
+        <div id="formSchemaContainer" class="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <!-- Rendered dynamically -->
         </div>
       </div>
 
-      <div class="pt-2">
-        <a href="https://www.gvcworld.eu/" target="_blank" class="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-sm transition">
-          Open Official Gateway (gvcworld.eu)
-          <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
-        </a>
-      </div>
-    </div>
-
-    <!-- 3. Detected Openings List -->
-    <div class="bg-white rounded-lg p-5 border border-gray-200 shadow-sm space-y-3">
-      <div class="flex items-center justify-between">
-        <h2 class="text-sm font-bold text-gray-900 uppercase tracking-wide flex items-center gap-2">
-          <i data-lucide="calendar-check-2" class="w-4 h-4 text-emerald-600"></i>
-          Detected Appointment Openings
-        </h2>
-        <span id="badgeSlotCount" class="text-xs font-semibold px-2.5 py-0.5 bg-gray-100 text-gray-700 rounded">0 Openings</span>
-      </div>
-
-      <div id="slotsContainer" class="space-y-2">
-        <div class="text-xs text-gray-500 text-center py-6 border border-dashed border-gray-200 rounded-md">
-          No open registration windows detected yet. The monitoring agent is actively watching for updates.
-        </div>
-      </div>
-    </div>
-
-    <!-- 4. Applicants Queue Card -->
-    <div class="bg-white rounded-lg p-5 border border-gray-200 shadow-sm space-y-4">
-      <div class="flex items-center justify-between">
-        <div>
+      <!-- 4. Detected Openings List -->
+      <div class="bg-white rounded-lg p-5 border border-gray-200 shadow-sm space-y-3">
+        <div class="flex items-center justify-between">
           <h2 class="text-sm font-bold text-gray-900 uppercase tracking-wide flex items-center gap-2">
-            <i data-lucide="users" class="w-4 h-4 text-gray-700"></i>
-            Applicant Queue
+            <i data-lucide="calendar-check-2" class="w-4 h-4 text-emerald-600"></i>
+            Detected Appointment Openings
           </h2>
-          <p class="text-xs text-gray-500">Save applicant details here for 1-click copy when slots open.</p>
+          <span id="badgeSlotCount" class="text-xs font-semibold px-2.5 py-0.5 bg-gray-100 text-gray-700 rounded">0 Openings</span>
         </div>
-        <button onclick="openApplicantModal()" class="px-3.5 py-2 rounded-md bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-xs transition flex items-center gap-1">
-          <i data-lucide="user-plus" class="w-3.5 h-3.5"></i>
-          Add Applicant
-        </button>
+
+        <div id="slotsContainer" class="space-y-2">
+          <div class="text-xs text-gray-500 text-center py-6 border border-dashed border-gray-200 rounded-md">
+            No open registration windows detected yet. The monitoring agent is actively watching for updates.
+          </div>
+        </div>
       </div>
 
-      <div id="applicantsContainer" class="grid grid-cols-1 md:grid-cols-2 gap-3">
-        <!-- Rendered dynamically -->
+    </div>
+
+    <!-- TAB 2: APPLICANTS & AUTO-APPLY PROFILES -->
+    <div id="panelApplicants" class="hidden space-y-6">
+
+      <div class="bg-white rounded-lg p-5 border border-gray-200 shadow-sm space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-gray-100 pb-4">
+          <div>
+            <h2 class="text-base font-bold text-gray-900 flex items-center gap-2">
+              <i data-lucide="users" class="w-5 h-5 text-emerald-600"></i>
+              Auto-Apply Applicant Profiles
+            </h2>
+            <p class="text-xs text-gray-500">Manage applicant profiles for dynamic pre-fill and 1-click test auto-applying.</p>
+          </div>
+          <div class="flex items-center space-x-2">
+            <button onclick="seedDemoProfiles()" class="px-3 py-2 rounded-md bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-medium text-xs border border-indigo-200 transition flex items-center gap-1.5">
+              <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+              Seed Demo Test Profiles
+            </button>
+            <button onclick="openApplicantModal()" class="px-3.5 py-2 rounded-md bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-xs shadow-sm transition flex items-center gap-1.5">
+              <i data-lucide="user-plus" class="w-3.5 h-3.5"></i>
+              Add Custom Profile
+            </button>
+          </div>
+        </div>
+
+        <div id="applicantsContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Rendered dynamically -->
+        </div>
       </div>
+
+    </div>
+
+    <!-- TAB 3: APPLICATION HISTORY & STATUS TRACKER -->
+    <div id="panelHistory" class="hidden space-y-6">
+
+      <div class="bg-white rounded-lg p-5 border border-gray-200 shadow-sm space-y-4">
+        <div class="flex items-center justify-between border-b border-gray-100 pb-4">
+          <div>
+            <h2 class="text-base font-bold text-gray-900 flex items-center gap-2">
+              <i data-lucide="history" class="w-5 h-5 text-emerald-600"></i>
+              Application History & Submission Log
+            </h2>
+            <p class="text-xs text-gray-500">Complete log of auto-filled & pre-filled visa applications stored in Neon PostgreSQL database.</p>
+          </div>
+          <div class="flex items-center space-x-2">
+            <button onclick="refreshHistory()" class="px-3 py-1.5 rounded-md bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-medium border border-gray-300 transition flex items-center gap-1">
+              <i data-lucide="rotate-cw" class="w-3.5 h-3.5"></i>
+              Refresh
+            </button>
+            <button onclick="clearHistory()" class="px-3 py-1.5 rounded-md bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-medium border border-rose-200 transition flex items-center gap-1">
+              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+              Clear History
+            </button>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-gray-50 text-gray-600 uppercase font-semibold border-b border-gray-200">
+              <tr>
+                <th class="p-3">Application ID</th>
+                <th class="p-3">Applicant Name</th>
+                <th class="p-3">Passport No</th>
+                <th class="p-3">VAC / Category</th>
+                <th class="p-3">Pre-fill Match Rate</th>
+                <th class="p-3">Status</th>
+                <th class="p-3">Timestamp</th>
+                <th class="p-3 text-right">Action</th>
+              </tr>
+            </thead>
+            <tbody id="historyTableBody" class="divide-y divide-gray-200">
+              <!-- Rendered dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
     </div>
 
   </main>

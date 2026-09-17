@@ -19,7 +19,32 @@ class MonitorAgent extends EventEmitter {
     this.targetUrl = 'https://pk-gr-services.gvcworld.eu/login/PK/en?lang=en_US';
     this.registerUrl = 'https://pk-gr-services.gvcworld.eu/register/PK/en?lang=en_US';
 
+    this.canonicalFormFields = [
+      { fieldKey: 'given_name', label: 'Given Name (as in Passport)', type: 'text', required: true, gvcSelector: 'input[name="first_name"], #first_name', matchProp: 'givenName' },
+      { fieldKey: 'surname', label: 'Surname / Family Name', type: 'text', required: true, gvcSelector: 'input[name="last_name"], #last_name', matchProp: 'surname' },
+      { fieldKey: 'passport_number', label: 'Passport Number', type: 'text', required: true, gvcSelector: 'input[name="passport_no"], #passport_no', matchProp: 'passportNumber' },
+      { fieldKey: 'passport_expiry', label: 'Passport Expiry Date', type: 'date', required: true, gvcSelector: 'input[name="passport_expiry"], #passport_expiry', matchProp: 'passportExpiry' },
+      { fieldKey: 'dob', label: 'Date of Birth', type: 'date', required: true, gvcSelector: 'input[name="dob"], #dob', matchProp: 'dob' },
+      { fieldKey: 'vac', label: 'Visa Application Centre (VAC)', type: 'select', required: true, options: ['Islamabad VAC', 'Lahore VAC'], gvcSelector: 'select[name="vac_id"], #vac_id', matchProp: 'vac' },
+      { fieldKey: 'category', label: 'Visa Category', type: 'select', required: true, options: ['Schengen Short Stay (Type C)', 'National Long Stay (Type D)'], gvcSelector: 'select[name="category_id"], #category_id', matchProp: 'category' },
+      { fieldKey: 'phone', label: 'Mobile Phone Number', type: 'tel', required: false, gvcSelector: 'input[name="phone"], #phone', matchProp: 'phone' },
+      { fieldKey: 'email', label: 'Email Address', type: 'email', required: true, gvcSelector: 'input[name="email"], #email', matchProp: 'email' }
+    ];
+
+    this.lastScrapedFormFields = null;
+
     this.addLog('SYSTEM', 'PostgreSQL Stealth Agent Engine initialized.');
+  }
+
+  getFormSchema() {
+    return {
+      isScraped: !!this.lastScrapedFormFields,
+      lastScrapedAt: this.lastScrapedSnapshot?.timestamp || new Date().toISOString(),
+      fieldsCount: this.canonicalFormFields.length,
+      requiredCount: this.canonicalFormFields.filter(f => f.required).length,
+      fields: this.canonicalFormFields,
+      targetPortal: 'GVC World Greece Pakistan Registration (/register/PK/en)'
+    };
   }
 
   setDbPool(pool) {

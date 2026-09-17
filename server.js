@@ -66,10 +66,24 @@ async function initDatabase() {
         status VARCHAR(50),
         details TEXT
       );
+
+      CREATE TABLE IF NOT EXISTS application_history (
+        id VARCHAR(50) PRIMARY KEY,
+        applicant_id VARCHAR(50),
+        applicant_name VARCHAR(200) NOT NULL,
+        passport_number VARCHAR(50) NOT NULL,
+        vac VARCHAR(100) NOT NULL,
+        category VARCHAR(100) NOT NULL,
+        slot_id VARCHAR(50),
+        status VARCHAR(50) DEFAULT 'AUTO_FILLED_SUCCESS',
+        autofill_match_rate INT DEFAULT 100,
+        details TEXT,
+        applied_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      );
     `);
 
     client.release();
-    console.log('[PostgreSQL] Schema initialized cleanly (applicants, scan_history, slots).');
+    console.log('[PostgreSQL] Schema initialized cleanly (applicants, scan_history, slots, application_history).');
   } catch (err) {
     console.error('[PostgreSQL] Error initializing Neon Database:', err.message);
   }
@@ -305,6 +319,159 @@ app.post('/api/simulate-slot', async (req, res) => {
   agent.addLog('SLOT', `🔔 TEST SLOT ALERT: Registration is available for ${category} at ${vac}!`, slot);
   agent.emit('slot', slot);
   res.json({ success: true, slot });
+});
+
+// Dynamic Scraped Form Field Schema
+app.get('/api/scraped-form-schema', (req, res) => {
+  res.json(agent.getFormSchema());
+});
+
+// Seed Demo Auto-Apply Profiles
+app.post('/api/applicants/seed-demo', async (req, res) => {
+  const demoProfiles = [
+    {
+      id: 'APP-DEMO-01',
+      given_name: 'Muhammad',
+      surname: 'Ali',
+      passport_number: 'PK9842104',
+      passport_expiry: '2031-08-15',
+      dob: '1992-05-12',
+      vac: 'Islamabad VAC',
+      category: 'Schengen Short Stay (Type C)',
+      sub_category: 'Tourism & Business',
+      phone: '+923001234567',
+      email: 'm.ali.demo@gvcworld-test.com'
+    },
+    {
+      id: 'APP-DEMO-02',
+      given_name: 'Fatima',
+      surname: 'Zahra',
+      passport_number: 'PK4720193',
+      passport_expiry: '2030-11-20',
+      dob: '1995-10-04',
+      vac: 'Lahore VAC',
+      category: 'National Long Stay (Type D)',
+      sub_category: 'Work & Family Reunion',
+      phone: '+923219876543',
+      email: 'f.zahra.demo@gvcworld-test.com'
+    }
+  ];
+
+  try {
+    for (const p of demoProfiles) {
+      await pool.query(`
+        INSERT INTO applicants (id, given_name, surname, passport_number, passport_expiry, dob, vac, category, sub_category, phone, email)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+        ON CONFLICT (id) DO UPDATE SET
+          given_name = EXCLUDED.given_name,
+          surname = EXCLUDED.surname,
+          passport_number = EXCLUDED.passport_number,
+          vac = EXCLUDED.vac,
+          category = EXCLUDED.category
+      `, [p.id, p.given_name, p.surname, p.passport_number, p.passport_expiry, p.dob, p.vac, p.category, p.sub_category, p.phone, p.email]);
+    }
+
+    agent.addLog('SYSTEM', 'Seed demo profiles added to Neon PostgreSQL database.');
+
+    const allRes = await pool.query('SELECT * FROM applicants ORDER BY created_at DESC');
+    broadcastEvent('applicants', allRes.rows.map(r => ({
+      id: r.id, givenName: r.given_name, surname: r.surname, passportNumber: r.passport_number, vac: r.vac, category: r.category
+    })));
+
+    res.json({ success: true, message: 'Demo applicant profiles seeded successfully!' });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to seed demo profiles: ' + err.message });
+  }
+});
+
+// AUTO-APPLY & Dynamic Form Pre-fill Submission Endpoint
+app.post('/api/applications/apply', async (req, res) => {
+  const { applicantId, slotId } = req.body;
+
+  try {
+    // 1. Fetch applicant from DB
+    const appRes = await pool.query('SELECT * FROM applicants WHERE id = $1', [applicantId]);
+    if (appRes.rows.length === 0) {
+      return res.status(404).json({ error: 'Applicant profile not found' });
+    }
+    const applicant = appRes.rows[0];
+
+    // 2. Map fields dynamically against GVC schema
+    const schema = agent.getFormSchema();
+    const matchedFields = schema.fields.map(f => {
+      let val = applicant[f.matchProp] || applicant[f.fieldKey] || '';
+      if (val instanceof Date) val = val.toISOString().split('T')[0];
+      return {
+        fieldKey: f.fieldKey,
+        label: f.label,
+        gvcSelector: f.gvcSelector,
+        mappedValue: val,
+        isPrefilled: !!val
+      };
+    });
+
+    const totalFields = matchedFields.length;
+    const prefilledCount = matchedFields.filter(f => f.isPrefilled).length;
+    const autofillMatchRate = Math.round((prefilledCount / totalFields) * 100);
+
+    const historyId = 'HIS-' + Date.now();
+    const applicantName = `${applicant.given_name} ${applicant.surname}`;
+
+    // 3. Save into application_history table
+    const query = `
+      INSERT INTO application_history (id, applicant_id, applicant_name, passport_number, vac, category, slot_id, status, autofill_match_rate, details)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+      RETURNING *
+    `;
+    const details = `Dynamically pre-filled ${prefilledCount}/${totalFields} required fields (${autofillMatchRate}% match). Direct portal link ready.`;
+    const result = await pool.query(query, [
+      historyId, applicant.id, applicantName, applicant.passport_number, applicant.vac, applicant.category, slotId || 'SLOT-LIVE', 'AUTO_FILLED_SUCCESS', autofillMatchRate, details
+    ]);
+
+    const entry = result.rows[0];
+    agent.addLog('APPLY', `⚡ AUTO-APPLY SUCCESS: Pre-filled profile for ${applicantName} (${applicant.vac}) — ${autofillMatchRate}% Field Match Rate!`, entry);
+
+    broadcastEvent('application_submitted', entry);
+
+    res.json({
+      success: true,
+      application: entry,
+      matchedFields,
+      portalUrl: 'https://www.gvcworld.eu/'
+    });
+  } catch (err) {
+    console.error('[PostgreSQL] Application submit error:', err.message);
+    res.status(500).json({ error: 'Failed to record application: ' + err.message });
+  }
+});
+
+// APPLICATION HISTORY ENDPOINTS
+app.get('/api/applications/history', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT * FROM application_history ORDER BY applied_at DESC');
+    res.json({ history: result.rows });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch application history: ' + err.message });
+  }
+});
+
+app.delete('/api/applications/history/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    await pool.query('DELETE FROM application_history WHERE id = $1', [id]);
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.delete('/api/applications/history', async (req, res) => {
+  try {
+    await pool.query('DELETE FROM application_history');
+    res.json({ success: true, message: 'Application history cleared' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // Start Express Server (when run standalone)
