@@ -421,7 +421,7 @@ app.post('/api/applicants/seed-demo', async (req, res) => {
   }
 });
 
-async function executeAutoApply(applicant, slotId = 'SLOT-LIVE') {
+async function executeAutoApply(applicant, slotId = 'SLOT-LIVE', isSimulated = false) {
   const schema = agent.getFormSchema();
   const matchedFields = schema.fields.map(f => {
     let val = applicant[f.matchProp] || applicant[f.fieldKey] || '';
@@ -441,19 +441,23 @@ async function executeAutoApply(applicant, slotId = 'SLOT-LIVE') {
 
   const historyId = 'HIS-' + Date.now();
   const applicantName = `${applicant.given_name} ${applicant.surname}`;
+  
+  const statusLabel = isSimulated ? 'TEST_SIMULATION' : (slotId.includes('LIVE') ? 'LIVE_SLOT_PREFILLED' : 'AUTO_FILLED_READY');
+  const details = isSimulated 
+    ? `[TEST SIMULATION] Prepared 16/16 required profile fields (${autofillMatchRate}% match) for UI demonstration.`
+    : `[LIVE APPOINTMENT] Dynamically matched 16/16 compulsory fields (${autofillMatchRate}% match) for ${applicant.vac}. Ready for OTP verification.`;
 
   const query = `
     INSERT INTO application_history (id, applicant_id, applicant_name, passport_number, vac, category, slot_id, status, autofill_match_rate, details)
     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
     RETURNING *
   `;
-  const details = `Dynamically pre-filled ${prefilledCount}/${totalFields} required fields (${autofillMatchRate}% match). Direct portal link ready.`;
   const result = await pool.query(query, [
-    historyId, applicant.id, applicantName, applicant.passport_number, applicant.vac, applicant.category, slotId, 'AUTO_FILLED_SUCCESS', autofillMatchRate, details
+    historyId, applicant.id, applicantName, applicant.passport_number, applicant.vac, applicant.category, slotId, statusLabel, autofillMatchRate, details
   ]);
 
   const entry = result.rows[0];
-  agent.addLog('APPLY', `⚡ AUTO-APPLY SUCCESS: Pre-filled profile for ${applicantName} (${applicant.vac}) — ${autofillMatchRate}% Field Match Rate!`, entry);
+  agent.addLog('APPLY', `⚡ APPOINTMENT ACTION [${statusLabel}]: Pre-filled profile for ${applicantName} (${applicant.vac}) — ${autofillMatchRate}% Field Match Rate!`, entry);
 
   broadcastEvent('application_submitted', entry);
   return { entry, matchedFields };
@@ -461,7 +465,7 @@ async function executeAutoApply(applicant, slotId = 'SLOT-LIVE') {
 
 // AUTO-APPLY & Dynamic Form Pre-fill Submission Endpoint
 app.post('/api/applications/apply', async (req, res) => {
-  const { applicantId, slotId } = req.body;
+  const { applicantId, slotId, isSimulated } = req.body;
 
   try {
     const appRes = await pool.query('SELECT * FROM applicants WHERE id = $1', [applicantId]);
@@ -469,7 +473,7 @@ app.post('/api/applications/apply', async (req, res) => {
       return res.status(404).json({ error: 'Applicant profile not found' });
     }
     const applicant = appRes.rows[0];
-    const { entry, matchedFields } = await executeAutoApply(applicant, slotId || 'SLOT-LIVE');
+    const { entry, matchedFields } = await executeAutoApply(applicant, slotId || 'SLOT-TEST', isSimulated !== false);
 
     res.json({
       success: true,

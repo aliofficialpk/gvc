@@ -450,35 +450,51 @@ function renderHistory(list) {
     return;
   }
 
-  container.innerHTML = list.map(h => `
-    <tr class="hover:bg-gray-50 transition">
-      <td class="p-3 font-mono font-bold text-gray-900">${escapeHtml(h.id)}</td>
-      <td class="p-3 font-semibold text-gray-900">${escapeHtml(h.applicant_name)}</td>
-      <td class="p-3 font-mono text-gray-700">${escapeHtml(h.passport_number)}</td>
-      <td class="p-3">
-        <div class="font-bold text-emerald-700">${escapeHtml(h.vac)}</div>
-        <div class="text-[10px] text-gray-500">${escapeHtml(h.category)}</div>
-      </td>
-      <td class="p-3">
-        <span class="px-2 py-0.5 rounded text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
-          ${h.autofill_match_rate}% Matched
-        </span>
-      </td>
-      <td class="p-3">
-        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-600 text-white uppercase tracking-wider">
-          ${escapeHtml(h.status)}
-        </span>
-      </td>
-      <td class="p-3 text-gray-500 font-mono text-[11px]">
-        ${new Date(h.applied_at).toLocaleString()}
-      </td>
-      <td class="p-3 text-right">
-        <button onclick="deleteHistoryItem('${h.id}')" class="text-gray-400 hover:text-rose-600 p-1 transition" title="Delete Log">
-          <i data-lucide="trash-2" class="w-4 h-4"></i>
-        </button>
-      </td>
-    </tr>
-  `).join('');
+  container.innerHTML = list.map(h => {
+    let badgeBg = 'bg-emerald-600 text-white';
+    let statusText = h.status || 'AUTO_FILLED_SUCCESS';
+
+    if (statusText === 'TEST_SIMULATION') {
+      badgeBg = 'bg-indigo-100 text-indigo-800 border border-indigo-200';
+      statusText = 'TEST RUN (SIMULATED)';
+    } else if (statusText === 'LIVE_SLOT_PREFILLED') {
+      badgeBg = 'bg-emerald-600 text-white shadow-sm';
+      statusText = '⚡ LIVE SLOT PRE-FILLED';
+    } else if (statusText === 'OTP_SUBMITTED') {
+      badgeBg = 'bg-amber-600 text-white font-bold';
+      statusText = '🔑 OTP SUBMITTED';
+    }
+
+    return `
+      <tr class="hover:bg-gray-50 transition">
+        <td class="p-3 font-mono font-bold text-gray-900">${escapeHtml(h.id)}</td>
+        <td class="p-3 font-semibold text-gray-900">${escapeHtml(h.applicant_name)}</td>
+        <td class="p-3 font-mono text-gray-700">${escapeHtml(h.passport_number)}</td>
+        <td class="p-3">
+          <div class="font-bold text-emerald-700">${escapeHtml(h.vac)}</div>
+          <div class="text-[10px] text-gray-500">${escapeHtml(h.category)}</div>
+        </td>
+        <td class="p-3">
+          <span class="px-2 py-0.5 rounded text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
+            ${h.autofill_match_rate}% Matched
+          </span>
+        </td>
+        <td class="p-3">
+          <span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${badgeBg}" title="${escapeHtml(h.details)}">
+            ${escapeHtml(statusText)}
+          </span>
+        </td>
+        <td class="p-3 text-gray-500 font-mono text-[11px]">
+          ${new Date(h.applied_at).toLocaleString()}
+        </td>
+        <td class="p-3 text-right">
+          <button onclick="deleteHistoryItem('${h.id}')" class="text-gray-400 hover:text-rose-600 p-1 transition" title="Delete Log">
+            <i data-lucide="trash-2" class="w-4 h-4"></i>
+          </button>
+        </td>
+      </tr>
+    `;
+  }).join('');
 
   if (window.lucide) lucide.createIcons();
 }
