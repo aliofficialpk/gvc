@@ -119,6 +119,8 @@ agent.on('log', (logEntry) => broadcastEvent('log', logEntry));
 agent.on('slot', (slotEntry) => broadcastEvent('slot', slotEntry));
 agent.on('status', (statusEntry) => broadcastEvent('status', statusEntry));
 agent.on('snapshot', (snapshotEntry) => broadcastEvent('snapshot', snapshotEntry));
+agent.on('otp_required', (otpSession) => broadcastEvent('otp_required', otpSession));
+agent.on('otp_submitted', (otpSession) => broadcastEvent('otp_submitted', otpSession));
 
 // --- REST API ENDPOINTS (PostgreSQL Dynamic CRUD) ---
 
@@ -472,6 +474,46 @@ app.delete('/api/applications/history', async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
+});
+
+// --- LIVE OTP RELAY & INJECTION ENDPOINTS ---
+
+// Submit OTP from UI to active Playwright session
+app.post('/api/applications/submit-otp', (req, res) => {
+  const { otpCode } = req.body;
+  if (!otpCode || otpCode.trim().length < 4) {
+    return res.status(400).json({ error: 'Please enter a valid OTP code (at least 4-6 digits).' });
+  }
+
+  const result = agent.submitOtp(otpCode.trim());
+  if (!result.success) {
+    return res.status(400).json({ error: result.error });
+  }
+
+  broadcastEvent('otp_submitted', result.session);
+  res.json({ success: true, message: 'OTP submitted and injected into portal session!', session: result.session });
+});
+
+// Trigger Simulated OTP Prompt for UI Testing
+app.post('/api/applications/trigger-otp-test', (req, res) => {
+  const applicantName = req.body.applicantName || 'Muhammad Ali';
+  const sentTo = req.body.sentTo || '+92 300 *****67 (Mobile SMS & Email)';
+
+  const session = {
+    id: 'OTP-' + Date.now(),
+    applicantName,
+    sentTo,
+    targetPortal: 'GVC World Greece Pakistan',
+    timeoutSeconds: 60,
+    requestedAt: new Date().toISOString()
+  };
+
+  agent.activeOtpSession = session;
+  agent.addLog('OTP', `🔐 OTP VERIFICATION REQUIRED for ${applicantName}. Sent to ${sentTo}. Awaiting user input on portal...`, session);
+  agent.emit('otp_required', session);
+  broadcastEvent('otp_required', session);
+
+  res.json({ success: true, session });
 });
 
 // Start Express Server (when run standalone)

@@ -33,7 +33,26 @@ class MonitorAgent extends EventEmitter {
 
     this.lastScrapedFormFields = null;
 
+    // Active OTP state handling
+    this.activeOtpSession = null;
+
     this.addLog('SYSTEM', 'PostgreSQL Stealth Agent Engine initialized.');
+  }
+
+  submitOtp(otpCode) {
+    if (!this.activeOtpSession) {
+      return { success: false, error: 'No active OTP verification session is waiting.' };
+    }
+    const session = this.activeOtpSession;
+    session.otpCode = otpCode;
+    session.status = 'OTP_SUBMITTED';
+    session.submittedAt = new Date().toISOString();
+
+    this.addLog('OTP', `🔑 OTP Code (${otpCode}) submitted for applicant ${session.applicantName}. Submitting to GVC portal form...`, session);
+    this.emit('otp_submitted', session);
+
+    this.activeOtpSession = null;
+    return { success: true, message: 'OTP successfully injected into portal application session.', session };
   }
 
   getFormSchema() {

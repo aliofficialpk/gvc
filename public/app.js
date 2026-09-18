@@ -121,6 +121,17 @@ function initEventStream() {
       renderHistory(state.history);
     });
 
+    evtSource.addEventListener('otp_required', (e) => {
+      const session = JSON.parse(e.data);
+      showOtpModal(session);
+    });
+
+    evtSource.addEventListener('otp_submitted', (e) => {
+      const session = JSON.parse(e.data);
+      closeOtpModal();
+      alert(`✅ OTP (${session.otpCode}) submitted successfully to portal! Application is finalizing...`);
+    });
+
   } catch(err) {
     console.log('SSE Stream fallback to polling');
   }
@@ -604,6 +615,90 @@ function copyApplicantInfo(id) {
   }).catch(() => {
     prompt('Copy applicant details:', text);
   });
+}
+
+// --- OTP VERIFICATION MODAL CONTROLLERS ---
+
+let otpTimerInterval = null;
+
+function showOtpModal(session) {
+  playSlotAlertChime();
+
+  const modal = document.getElementById('otpModal');
+  const textSentTo = document.getElementById('textOtpSentTo');
+  const inputOtp = document.getElementById('inputOtpCode');
+  const ticker = document.getElementById('otpTimerTicker');
+
+  if (textSentTo) {
+    textSentTo.innerHTML = `Sent via SMS & Email to applicant <strong>${escapeHtml(session.applicantName)}</strong> (${escapeHtml(session.sentTo || 'Mobile SMS & Email')})`;
+  }
+
+  if (inputOtp) {
+    inputOtp.value = '';
+    inputOtp.focus();
+  }
+
+  if (modal) modal.classList.remove('hidden');
+
+  let remaining = session.timeoutSeconds || 60;
+  if (ticker) ticker.innerText = `${remaining}s`;
+
+  if (otpTimerInterval) clearInterval(otpTimerInterval);
+  otpTimerInterval = setInterval(() => {
+    remaining--;
+    if (ticker) ticker.innerText = `${remaining}s`;
+    if (remaining <= 0) {
+      clearInterval(otpTimerInterval);
+      closeOtpModal();
+    }
+  }, 1000);
+
+  if (window.lucide) lucide.createIcons();
+}
+
+function closeOtpModal() {
+  const modal = document.getElementById('otpModal');
+  if (modal) modal.classList.add('hidden');
+  if (otpTimerInterval) {
+    clearInterval(otpTimerInterval);
+    otpTimerInterval = null;
+  }
+}
+
+async function submitOtpFromModal(e) {
+  e.preventDefault();
+  const inputOtp = document.getElementById('inputOtpCode');
+  if (!inputOtp || !inputOtp.value.trim()) return;
+
+  const otpCode = inputOtp.value.trim();
+
+  try {
+    const res = await fetch('/api/applications/submit-otp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ otpCode })
+    });
+    const data = await res.json();
+    if (data.success) {
+      closeOtpModal();
+      alert(`🎉 OTP Code (${otpCode}) Injected into GVC Portal Session!\nApplication submission completed.`);
+      refreshAll();
+    } else {
+      alert('OTP error: ' + (data.error || 'Failed to submit OTP'));
+    }
+  } catch(err) {
+    alert('Failed to send OTP to server: ' + err.message);
+  }
+}
+
+async function triggerOtpTestPrompt() {
+  try {
+    await fetch('/api/applications/trigger-otp-test', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ applicantName: 'Muhammad Ali', sentTo: '+92 300 *****67 (Mobile SMS & Email)' })
+    });
+  } catch(e) {}
 }
 
 function escapeHtml(str) {
