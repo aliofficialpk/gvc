@@ -395,30 +395,35 @@
           <div>
             <label class="block text-xs font-medium text-gray-700 mb-1">Visa Application Centre *</label>
             <select id="selectVac" class="input-field">
-              <option value="Islamabad VAC">Islamabad VAC</option>
-              <option value="Lahore VAC">Lahore VAC</option>
+              <option value="Islamabad VAC">Islamabad VAC (Islamabad G-4)</option>
+              <option value="Lahore VAC">Lahore VAC (Lahore Gulberg III)</option>
+              <option value="Karachi VAC">Karachi VAC (Karachi Clifton)</option>
             </select>
           </div>
           <div>
             <label class="block text-xs font-medium text-gray-700 mb-1">Visa Category *</label>
             <select id="selectCategory" class="input-field">
-              <option value="Schengen Short Stay (Type C)">Schengen Short Stay (Type C)</option>
-              <option value="National Long Stay (Type D)">National Long Stay (Type D)</option>
-              <option value="Seamen / Maritime Visa (Type C/D)">Seamen / Maritime Visa (Type C/D)</option>
-              <option value="EU / EEA Family Member">EU / EEA Family Member</option>
-              <option value="Golden Visa / Investment">Golden Visa / Investment</option>
+              <option value="Short Stay Schengen Visa (Type C)">Short Stay Schengen Visa (Type C)</option>
+              <option value="Long Stay National Visa (Type D)">Long Stay National Visa (Type D)</option>
+              <option value="EU / EEA Family Member Visa">EU / EEA Family Member Visa</option>
+              <option value="Seamen / Maritime Transit Visa">Seamen / Maritime Transit Visa</option>
+              <option value="Golden Visa & Strategic Investment">Golden Visa & Strategic Investment</option>
             </select>
           </div>
           <div>
             <label class="block text-xs font-medium text-gray-700 mb-1">Sub-Category / Purpose *</label>
             <select id="selectSubCategory" class="input-field">
-              <option value="Tourism & Private Visit">Tourism & Private Visit</option>
-              <option value="Business & Conference">Business & Conference</option>
-              <option value="Work & Employment Contract">Work & Employment Contract</option>
-              <option value="Study & Vocational Training">Study & Vocational Training</option>
-              <option value="Family Reunion & Spouse">Family Reunion & Spouse</option>
-              <option value="Medical Treatment">Medical Treatment</option>
-              <option value="Transit & Airport Transit">Transit & Airport Transit</option>
+              <option value="Tourism & Private Family Visit">Tourism & Private Family Visit</option>
+              <option value="Business, Commercial & Conference">Business, Commercial & Conference</option>
+              <option value="Employment & Dependent Work Contract (Type D)">Employment & Dependent Work Contract (Type D)</option>
+              <option value="Seasonal Agricultural / Aquatic Work (Type D)">Seasonal Agricultural / Aquatic Work (Type D)</option>
+              <option value="Higher Education & University Studies (Type D)">Higher Education & University Studies (Type D)</option>
+              <option value="Family Reunification (Type D)">Family Reunification (Type D)</option>
+              <option value="Financially Independent Persons - FIP (Type D)">Financially Independent Persons - FIP (Type D)</option>
+              <option value="Cultural, Scientific & Sports Events">Cultural, Scientific & Sports Events</option>
+              <option value="Medical Treatment & Health Care">Medical Treatment & Health Care</option>
+              <option value="Official Delegation & Government Mission">Official Delegation & Government Mission</option>
+              <option value="Airport Transit & Seamen Transit">Airport Transit & Seamen Transit</option>
             </select>
           </div>
         </div>
@@ -488,6 +493,49 @@
           </button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- Stage Audit Detail Modal -->
+  <div id="stageAuditModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white border border-gray-200 rounded-xl max-w-xl w-full p-6 space-y-4 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between pb-3 border-b border-gray-200">
+        <div class="flex items-center space-x-2">
+          <div class="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-700 font-bold">
+            <i data-lucide="list-checks" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h3 id="auditModalTitle" class="text-base font-bold text-gray-900 leading-tight">Application Stage Audit & Diagnostic Log</h3>
+            <p id="auditModalSub" class="text-[11px] text-gray-500">Applicant: Muhammad Ali (PK9842104)</p>
+          </div>
+        </div>
+        <button onclick="closeStageAuditModal()" class="text-gray-400 hover:text-gray-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+
+      <!-- Execution Status Banner -->
+      <div id="auditModalStatusBanner" class="p-3.5 rounded-lg bg-emerald-50 border border-emerald-200 space-y-1 text-xs">
+        <!-- Rendered dynamically -->
+      </div>
+
+      <!-- 6-Stage Clearance Progress Checklist -->
+      <div class="space-y-2">
+        <h4 class="text-xs font-bold text-gray-900 uppercase tracking-wider flex items-center gap-1.5">
+          <i data-lucide="git-commit" class="w-4 h-4 text-emerald-600"></i>
+          Multi-Stage Portal Execution Audit (Stages 1 to 6)
+        </h4>
+        <div id="auditStagesList" class="space-y-2 text-xs">
+          <!-- Rendered dynamically -->
+        </div>
+      </div>
+
+      <!-- Snapshot Proof Link -->
+      <div id="auditModalSnapshotBox" class="pt-2 border-t border-gray-100 flex items-center justify-between">
+        <!-- Rendered dynamically -->
+      </div>
+
+      <div class="pt-2 flex justify-end">
+        <button onclick="closeStageAuditModal()" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-md">Close Audit</button>
+      </div>
     </div>
   </div>
 
