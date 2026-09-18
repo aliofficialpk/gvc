@@ -291,13 +291,16 @@ function renderFormSchema(schema) {
   if (badge) badge.innerText = `${schema.fieldsCount} Form Fields Detected`;
 
   container.innerHTML = schema.fields.map(f => `
-    <div class="p-3 rounded-md bg-gray-50 border border-gray-200 space-y-1 hover:border-emerald-300 transition">
+    <div class="p-3 rounded-md bg-white border border-gray-200 space-y-1 hover:border-emerald-400 shadow-sm transition">
       <div class="flex items-center justify-between">
         <span class="font-bold text-gray-900 text-xs">${escapeHtml(f.label)}</span>
-        ${f.required ? '<span class="text-[10px] bg-amber-100 text-amber-800 font-bold px-1.5 py-0.5 rounded">REQUIRED</span>' : '<span class="text-[10px] bg-gray-200 text-gray-600 px-1.5 py-0.5 rounded">OPTIONAL</span>'}
+        <span class="text-[10px] bg-amber-100 text-amber-800 font-bold px-1.5 py-0.5 rounded uppercase">COMPULSORY *</span>
+      </div>
+      <div class="text-[10px] text-indigo-700 font-semibold uppercase tracking-wider">
+        ${escapeHtml(f.stage || 'General Field')}
       </div>
       <div class="text-[11px] font-mono text-emerald-700 font-semibold truncate">
-        Key: ${escapeHtml(f.fieldKey)}
+        Field Key: ${escapeHtml(f.fieldKey)} (${escapeHtml(f.type)})
       </div>
       <div class="text-[10px] text-gray-500 font-mono truncate" title="${escapeHtml(f.gvcSelector)}">
         Selector: ${escapeHtml(f.gvcSelector)}

@@ -20,15 +20,22 @@ class MonitorAgent extends EventEmitter {
     this.registerUrl = 'https://pk-gr-services.gvcworld.eu/register/PK/en?lang=en_US';
 
     this.canonicalFormFields = [
-      { fieldKey: 'given_name', label: 'Given Name (as in Passport)', type: 'text', required: true, gvcSelector: 'input[name="first_name"], #first_name', matchProp: 'givenName' },
-      { fieldKey: 'surname', label: 'Surname / Family Name', type: 'text', required: true, gvcSelector: 'input[name="last_name"], #last_name', matchProp: 'surname' },
-      { fieldKey: 'passport_number', label: 'Passport Number', type: 'text', required: true, gvcSelector: 'input[name="passport_no"], #passport_no', matchProp: 'passportNumber' },
-      { fieldKey: 'passport_expiry', label: 'Passport Expiry Date', type: 'date', required: true, gvcSelector: 'input[name="passport_expiry"], #passport_expiry', matchProp: 'passportExpiry' },
-      { fieldKey: 'dob', label: 'Date of Birth', type: 'date', required: true, gvcSelector: 'input[name="dob"], #dob', matchProp: 'dob' },
-      { fieldKey: 'vac', label: 'Visa Application Centre (VAC)', type: 'select', required: true, options: ['Islamabad VAC', 'Lahore VAC'], gvcSelector: 'select[name="vac_id"], #vac_id', matchProp: 'vac' },
-      { fieldKey: 'category', label: 'Visa Category', type: 'select', required: true, options: ['Schengen Short Stay (Type C)', 'National Long Stay (Type D)'], gvcSelector: 'select[name="category_id"], #category_id', matchProp: 'category' },
-      { fieldKey: 'phone', label: 'Mobile Phone Number', type: 'tel', required: false, gvcSelector: 'input[name="phone"], #phone', matchProp: 'phone' },
-      { fieldKey: 'email', label: 'Email Address', type: 'email', required: true, gvcSelector: 'input[name="email"], #email', matchProp: 'email' }
+      { fieldKey: 'username', label: 'Portal Username / Account Email', type: 'text', required: true, stage: 'Account Authentication', gvcSelector: 'input[name="email"], input[name="username"], #email', matchProp: 'username' },
+      { fieldKey: 'password', label: 'Portal Password', type: 'password', required: true, stage: 'Account Authentication', gvcSelector: 'input[name="password"], #password', matchProp: 'password' },
+      { fieldKey: 'given_name', label: 'Given Name (as in Passport)', type: 'text', required: true, stage: 'Applicant Personal Details', gvcSelector: 'input[name="first_name"], #first_name', matchProp: 'givenName' },
+      { fieldKey: 'surname', label: 'Surname / Family Name', type: 'text', required: true, stage: 'Applicant Personal Details', gvcSelector: 'input[name="last_name"], #last_name', matchProp: 'surname' },
+      { fieldKey: 'dob', label: 'Date of Birth', type: 'date', required: true, stage: 'Applicant Personal Details', gvcSelector: 'input[name="dob"], #dob', matchProp: 'dob' },
+      { fieldKey: 'gender', label: 'Gender / Sex', type: 'select', required: true, options: ['Male', 'Female'], stage: 'Applicant Personal Details', gvcSelector: 'select[name="gender"], #gender', matchProp: 'gender' },
+      { fieldKey: 'nationality', label: 'Country of Nationality', type: 'text', required: true, stage: 'Applicant Personal Details', gvcSelector: 'input[name="nationality"], #nationality', matchProp: 'nationality' },
+      { fieldKey: 'passport_number', label: 'Passport Number', type: 'text', required: true, stage: 'Passport Information', gvcSelector: 'input[name="passport_no"], #passport_no', matchProp: 'passportNumber' },
+      { fieldKey: 'passport_issue', label: 'Passport Issue Date', type: 'date', required: true, stage: 'Passport Information', gvcSelector: 'input[name="passport_issue"], #passport_issue', matchProp: 'passportIssue' },
+      { fieldKey: 'passport_expiry', label: 'Passport Expiry Date', type: 'date', required: true, stage: 'Passport Information', gvcSelector: 'input[name="passport_expiry"], #passport_expiry', matchProp: 'passportExpiry' },
+      { fieldKey: 'passport_place', label: 'Place of Issue', type: 'text', required: true, stage: 'Passport Information', gvcSelector: 'input[name="passport_place"], #passport_place', matchProp: 'passportPlace' },
+      { fieldKey: 'vac', label: 'Visa Application Centre (VAC)', type: 'select', required: true, options: ['Islamabad VAC', 'Lahore VAC'], stage: 'Appointment Selection', gvcSelector: 'select[name="vac_id"], #vac_id', matchProp: 'vac' },
+      { fieldKey: 'category', label: 'Visa Category', type: 'select', required: true, options: ['Schengen Short Stay (Type C)', 'National Long Stay (Type D)'], stage: 'Appointment Selection', gvcSelector: 'select[name="category_id"], #category_id', matchProp: 'category' },
+      { fieldKey: 'sub_category', label: 'Visa Sub-Category / Purpose', type: 'select', required: true, options: ['Tourism & Business', 'Work & Employment', 'Family Reunion', 'Study'], stage: 'Appointment Selection', gvcSelector: 'select[name="sub_category_id"], #sub_category_id', matchProp: 'subCategory' },
+      { fieldKey: 'phone', label: 'Mobile Phone Number (for SMS OTP)', type: 'tel', required: true, stage: 'Contact & OTP Details', gvcSelector: 'input[name="phone"], #phone', matchProp: 'phone' },
+      { fieldKey: 'email', label: 'Email Address (for Confirmation & OTP)', type: 'email', required: true, stage: 'Contact & OTP Details', gvcSelector: 'input[name="email"], #email', matchProp: 'email' }
     ];
 
     this.lastScrapedFormFields = null;
