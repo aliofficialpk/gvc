@@ -122,7 +122,20 @@ function broadcastEvent(eventType, payload) {
 
 // Subscribe agent events to SSE stream
 agent.on('log', (logEntry) => broadcastEvent('log', logEntry));
-agent.on('slot', (slotEntry) => broadcastEvent('slot', slotEntry));
+agent.on('slot', async (slotEntry) => {
+  broadcastEvent('slot', slotEntry);
+  
+  // AUTOMATIC AUTO-APPLY TRIGGER: When a slot opens, automatically apply for all active profiles!
+  try {
+    const activeApplicants = await pool.query("SELECT * FROM applicants");
+    for (const applicant of activeApplicants.rows) {
+      console.log(`[AUTO-APPLY TRIGGER] Slot detected (${slotEntry.id})! Automatically pre-filling profile ${applicant.given_name} ${applicant.surname}...`);
+      await executeAutoApply(applicant, slotEntry.id);
+    }
+  } catch(err) {
+    console.error('[AUTO-APPLY TRIGGER ERROR]:', err.message);
+  }
+});
 agent.on('status', (statusEntry) => broadcastEvent('status', statusEntry));
 agent.on('snapshot', (snapshotEntry) => broadcastEvent('snapshot', snapshotEntry));
 agent.on('otp_required', (otpSession) => broadcastEvent('otp_required', otpSession));
@@ -408,54 +421,55 @@ app.post('/api/applicants/seed-demo', async (req, res) => {
   }
 });
 
+async function executeAutoApply(applicant, slotId = 'SLOT-LIVE') {
+  const schema = agent.getFormSchema();
+  const matchedFields = schema.fields.map(f => {
+    let val = applicant[f.matchProp] || applicant[f.fieldKey] || '';
+    if (val instanceof Date) val = val.toISOString().split('T')[0];
+    return {
+      fieldKey: f.fieldKey,
+      label: f.label,
+      gvcSelector: f.gvcSelector,
+      mappedValue: val,
+      isPrefilled: !!val
+    };
+  });
+
+  const totalFields = matchedFields.length;
+  const prefilledCount = matchedFields.filter(f => f.isPrefilled).length;
+  const autofillMatchRate = Math.round((prefilledCount / totalFields) * 100);
+
+  const historyId = 'HIS-' + Date.now();
+  const applicantName = `${applicant.given_name} ${applicant.surname}`;
+
+  const query = `
+    INSERT INTO application_history (id, applicant_id, applicant_name, passport_number, vac, category, slot_id, status, autofill_match_rate, details)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+    RETURNING *
+  `;
+  const details = `Dynamically pre-filled ${prefilledCount}/${totalFields} required fields (${autofillMatchRate}% match). Direct portal link ready.`;
+  const result = await pool.query(query, [
+    historyId, applicant.id, applicantName, applicant.passport_number, applicant.vac, applicant.category, slotId, 'AUTO_FILLED_SUCCESS', autofillMatchRate, details
+  ]);
+
+  const entry = result.rows[0];
+  agent.addLog('APPLY', `⚡ AUTO-APPLY SUCCESS: Pre-filled profile for ${applicantName} (${applicant.vac}) — ${autofillMatchRate}% Field Match Rate!`, entry);
+
+  broadcastEvent('application_submitted', entry);
+  return { entry, matchedFields };
+}
+
 // AUTO-APPLY & Dynamic Form Pre-fill Submission Endpoint
 app.post('/api/applications/apply', async (req, res) => {
   const { applicantId, slotId } = req.body;
 
   try {
-    // 1. Fetch applicant from DB
     const appRes = await pool.query('SELECT * FROM applicants WHERE id = $1', [applicantId]);
     if (appRes.rows.length === 0) {
       return res.status(404).json({ error: 'Applicant profile not found' });
     }
     const applicant = appRes.rows[0];
-
-    // 2. Map fields dynamically against GVC schema
-    const schema = agent.getFormSchema();
-    const matchedFields = schema.fields.map(f => {
-      let val = applicant[f.matchProp] || applicant[f.fieldKey] || '';
-      if (val instanceof Date) val = val.toISOString().split('T')[0];
-      return {
-        fieldKey: f.fieldKey,
-        label: f.label,
-        gvcSelector: f.gvcSelector,
-        mappedValue: val,
-        isPrefilled: !!val
-      };
-    });
-
-    const totalFields = matchedFields.length;
-    const prefilledCount = matchedFields.filter(f => f.isPrefilled).length;
-    const autofillMatchRate = Math.round((prefilledCount / totalFields) * 100);
-
-    const historyId = 'HIS-' + Date.now();
-    const applicantName = `${applicant.given_name} ${applicant.surname}`;
-
-    // 3. Save into application_history table
-    const query = `
-      INSERT INTO application_history (id, applicant_id, applicant_name, passport_number, vac, category, slot_id, status, autofill_match_rate, details)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
-      RETURNING *
-    `;
-    const details = `Dynamically pre-filled ${prefilledCount}/${totalFields} required fields (${autofillMatchRate}% match). Direct portal link ready.`;
-    const result = await pool.query(query, [
-      historyId, applicant.id, applicantName, applicant.passport_number, applicant.vac, applicant.category, slotId || 'SLOT-LIVE', 'AUTO_FILLED_SUCCESS', autofillMatchRate, details
-    ]);
-
-    const entry = result.rows[0];
-    agent.addLog('APPLY', `⚡ AUTO-APPLY SUCCESS: Pre-filled profile for ${applicantName} (${applicant.vac}) — ${autofillMatchRate}% Field Match Rate!`, entry);
-
-    broadcastEvent('application_submitted', entry);
+    const { entry, matchedFields } = await executeAutoApply(applicant, slotId || 'SLOT-LIVE');
 
     res.json({
       success: true,

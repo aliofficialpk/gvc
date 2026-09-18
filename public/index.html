@@ -390,8 +390,8 @@
           <input type="text" id="inputPassportPlace" value="Islamabad" placeholder="e.g. Islamabad" class="input-field">
         </div>
 
-        <!-- Visa Category Selection -->
-        <div class="grid grid-cols-2 gap-3">
+        <!-- Visa Category & Travel Purpose Selection -->
+        <div class="grid grid-cols-3 gap-3">
           <div>
             <label class="block text-xs font-medium text-gray-700 mb-1">Visa Application Centre *</label>
             <select id="selectVac" class="input-field">
@@ -404,6 +404,21 @@
             <select id="selectCategory" class="input-field">
               <option value="Schengen Short Stay (Type C)">Schengen Short Stay (Type C)</option>
               <option value="National Long Stay (Type D)">National Long Stay (Type D)</option>
+              <option value="Seamen / Maritime Visa (Type C/D)">Seamen / Maritime Visa (Type C/D)</option>
+              <option value="EU / EEA Family Member">EU / EEA Family Member</option>
+              <option value="Golden Visa / Investment">Golden Visa / Investment</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-gray-700 mb-1">Sub-Category / Purpose *</label>
+            <select id="selectSubCategory" class="input-field">
+              <option value="Tourism & Private Visit">Tourism & Private Visit</option>
+              <option value="Business & Conference">Business & Conference</option>
+              <option value="Work & Employment Contract">Work & Employment Contract</option>
+              <option value="Study & Vocational Training">Study & Vocational Training</option>
+              <option value="Family Reunion & Spouse">Family Reunion & Spouse</option>
+              <option value="Medical Treatment">Medical Treatment</option>
+              <option value="Transit & Airport Transit">Transit & Airport Transit</option>
             </select>
           </div>
         </div>

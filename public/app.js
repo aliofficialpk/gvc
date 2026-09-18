@@ -590,6 +590,7 @@ async function saveApplicant(e) {
     passportPlace: document.getElementById('inputPassportPlace')?.value || 'Islamabad',
     vac: document.getElementById('selectVac').value,
     category: document.getElementById('selectCategory').value,
+    subCategory: document.getElementById('selectSubCategory')?.value || 'Tourism & Private Visit',
     phone: document.getElementById('inputPhone').value,
     email: document.getElementById('inputEmail').value
   };
