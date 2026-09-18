@@ -9,6 +9,7 @@ const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/screenshots', express.static(path.join(__dirname, 'public/screenshots')));
 
 // PostgreSQL Pool Connection to Neon Cloud
 const dbUrl = process.env.DATABASE_URL || 'postgresql://neondb_owner:npg_BaZGFe5oOuK8@ep-fragrant-silence-b4jg7g4v-pooler.c-6.us-east-2.aws.neon.tech/neondb?sslmode=require';
@@ -422,50 +423,13 @@ app.post('/api/applicants/seed-demo', async (req, res) => {
 });
 
 async function executeAutoApply(applicant, slotId = 'SLOT-LIVE', isSimulated = false) {
-  const schema = agent.getFormSchema();
-  const matchedFields = schema.fields.map(f => {
-    let val = applicant[f.matchProp] || applicant[f.fieldKey] || '';
-    if (val instanceof Date) val = val.toISOString().split('T')[0];
-    return {
-      fieldKey: f.fieldKey,
-      label: f.label,
-      gvcSelector: f.gvcSelector,
-      mappedValue: val,
-      isPrefilled: !!val
-    };
-  });
-
-  const totalFields = matchedFields.length;
-  const prefilledCount = matchedFields.filter(f => f.isPrefilled).length;
-  const autofillMatchRate = Math.round((prefilledCount / totalFields) * 100);
-
-  const historyId = 'HIS-' + Date.now();
-  const applicantName = `${applicant.given_name} ${applicant.surname}`;
-  
-  const statusLabel = isSimulated ? 'TEST_SIMULATION' : (slotId.includes('LIVE') ? 'LIVE_SLOT_PREFILLED' : 'AUTO_FILLED_READY');
-  const details = isSimulated 
-    ? `[TEST SIMULATION] Prepared 16/16 required profile fields (${autofillMatchRate}% match) for UI demonstration.`
-    : `[LIVE APPOINTMENT] Dynamically matched 16/16 compulsory fields (${autofillMatchRate}% match) for ${applicant.vac}. Ready for OTP verification.`;
-
-  const query = `
-    INSERT INTO application_history (id, applicant_id, applicant_name, passport_number, vac, category, slot_id, status, autofill_match_rate, details)
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
-    RETURNING *
-  `;
-  const result = await pool.query(query, [
-    historyId, applicant.id, applicantName, applicant.passport_number, applicant.vac, applicant.category, slotId, statusLabel, autofillMatchRate, details
-  ]);
-
-  const entry = result.rows[0];
-  agent.addLog('APPLY', `⚡ APPOINTMENT ACTION [${statusLabel}]: Pre-filled profile for ${applicantName} (${applicant.vac}) — ${autofillMatchRate}% Field Match Rate!`, entry);
-
-  broadcastEvent('application_submitted', entry);
-  return { entry, matchedFields };
+  // Execute real Playwright browser interaction on GVC portal
+  return await agent.executeRealPortalApplication(applicant, slotId);
 }
 
 // AUTO-APPLY & Dynamic Form Pre-fill Submission Endpoint
 app.post('/api/applications/apply', async (req, res) => {
-  const { applicantId, slotId, isSimulated } = req.body;
+  const { applicantId, slotId } = req.body;
 
   try {
     const appRes = await pool.query('SELECT * FROM applicants WHERE id = $1', [applicantId]);
@@ -473,12 +437,13 @@ app.post('/api/applications/apply', async (req, res) => {
       return res.status(404).json({ error: 'Applicant profile not found' });
     }
     const applicant = appRes.rows[0];
-    const { entry, matchedFields } = await executeAutoApply(applicant, slotId || 'SLOT-TEST', isSimulated !== false);
+    const { entry, matchedFields, screenshotUrl } = await executeAutoApply(applicant, slotId || 'SLOT-TEST');
 
     res.json({
       success: true,
       application: entry,
       matchedFields,
+      screenshotUrl,
       portalUrl: 'https://www.gvcworld.eu/'
     });
   } catch (err) {

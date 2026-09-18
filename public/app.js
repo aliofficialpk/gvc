@@ -454,16 +454,28 @@ function renderHistory(list) {
     let badgeBg = 'bg-emerald-600 text-white';
     let statusText = h.status || 'AUTO_FILLED_SUCCESS';
 
-    if (statusText === 'TEST_SIMULATION') {
+    if (statusText === 'PORTAL_FILLED_SUCCESS' || statusText === 'LIVE_SLOT_PREFILLED') {
+      badgeBg = 'bg-emerald-600 text-white shadow-sm';
+      statusText = '⚡ PORTAL FORM PRE-FILLED';
+    } else if (statusText === 'WAF_GATEWAY_PROTECTED') {
+      badgeBg = 'bg-amber-100 text-amber-900 border border-amber-300 font-bold';
+      statusText = '🛡️ WAF GATEWAY PROTECTED';
+    } else if (statusText === 'PORTAL_INSPECTED') {
+      badgeBg = 'bg-blue-100 text-blue-900 border border-blue-200 font-bold';
+      statusText = '🔍 PORTAL LIVE INSPECTED';
+    } else if (statusText === 'OTP_SUBMITTED') {
+      badgeBg = 'bg-purple-600 text-white font-bold';
+      statusText = '🔑 OTP INJECTED & SUBMITTED';
+    } else if (statusText === 'TEST_SIMULATION') {
       badgeBg = 'bg-indigo-100 text-indigo-800 border border-indigo-200';
       statusText = 'TEST RUN (SIMULATED)';
-    } else if (statusText === 'LIVE_SLOT_PREFILLED') {
-      badgeBg = 'bg-emerald-600 text-white shadow-sm';
-      statusText = '⚡ LIVE SLOT PRE-FILLED';
-    } else if (statusText === 'OTP_SUBMITTED') {
-      badgeBg = 'bg-amber-600 text-white font-bold';
-      statusText = '🔑 OTP SUBMITTED';
     }
+
+    const proofBtn = h.screenshotUrl ? `
+      <a href="${escapeHtml(h.screenshotUrl)}" target="_blank" class="inline-flex items-center gap-1 text-[10px] font-bold text-indigo-600 hover:underline mt-1">
+        <i data-lucide="camera" class="w-3 h-3"></i> View Portal Snapshot
+      </a>
+    ` : '';
 
     return `
       <tr class="hover:bg-gray-50 transition">
@@ -483,6 +495,7 @@ function renderHistory(list) {
           <span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${badgeBg}" title="${escapeHtml(h.details)}">
             ${escapeHtml(statusText)}
           </span>
+          ${proofBtn}
         </td>
         <td class="p-3 text-gray-500 font-mono text-[11px]">
           ${new Date(h.applied_at).toLocaleString()}
