@@ -34,12 +34,18 @@ async function initDatabase() {
         surname VARCHAR(100) NOT NULL,
         passport_number VARCHAR(50) NOT NULL,
         passport_expiry DATE,
+        passport_issue DATE,
+        passport_place VARCHAR(100),
         dob DATE,
+        gender VARCHAR(20),
+        nationality VARCHAR(100) DEFAULT 'Pakistan',
         vac VARCHAR(100) NOT NULL,
         category VARCHAR(100) NOT NULL,
         sub_category VARCHAR(100),
         phone VARCHAR(50),
         email VARCHAR(100),
+        username VARCHAR(100) DEFAULT 'Account01',
+        password VARCHAR(100) DEFAULT 'Swift@001',
         status VARCHAR(50) DEFAULT 'Monitoring Active',
         created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
       );
@@ -190,13 +196,19 @@ app.get('/api/applicants', async (req, res) => {
       givenName: r.given_name,
       surname: r.surname,
       passportNumber: r.passport_number,
-      passportExpiry: r.passport_expiry ? r.passport_expiry.toISOString().split('T')[0] : '',
-      dob: r.dob ? r.dob.toISOString().split('T')[0] : '',
+      passportExpiry: r.passport_expiry ? (r.passport_expiry.toISOString ? r.passport_expiry.toISOString().split('T')[0] : r.passport_expiry) : '',
+      passportIssue: r.passport_issue ? (r.passport_issue.toISOString ? r.passport_issue.toISOString().split('T')[0] : r.passport_issue) : '',
+      passportPlace: r.passport_place || 'Islamabad',
+      dob: r.dob ? (r.dob.toISOString ? r.dob.toISOString().split('T')[0] : r.dob) : '',
+      gender: r.gender || 'Male',
+      nationality: r.nationality || 'Pakistan',
       vac: r.vac,
       category: r.category,
-      subCategory: r.sub_category,
-      phone: r.phone,
-      email: r.email,
+      subCategory: r.sub_category || 'General',
+      phone: r.phone || '',
+      email: r.email || '',
+      username: r.username || 'Account01',
+      password: r.password || 'Swift@001',
       status: r.status,
       createdAt: r.created_at
     }));
@@ -208,7 +220,10 @@ app.get('/api/applicants', async (req, res) => {
 });
 
 app.post('/api/applicants', async (req, res) => {
-  const { givenName, surname, passportNumber, passportExpiry, dob, vac, category, subCategory, phone, email } = req.body;
+  const {
+    givenName, surname, passportNumber, passportExpiry, passportIssue, passportPlace,
+    dob, gender, nationality, vac, category, subCategory, phone, email, username, password
+  } = req.body;
 
   if (!givenName || !surname || !passportNumber || !vac || !category) {
     return res.status(400).json({ error: 'Missing required applicant fields' });
@@ -219,18 +234,24 @@ app.post('/api/applicants', async (req, res) => {
   const sur = surname.trim();
   const pass = passportNumber.trim().toUpperCase();
   const exp = passportExpiry || '2030-01-01';
+  const issue = passportIssue || '2020-01-01';
+  const place = passportPlace || 'Islamabad';
   const birth = dob || '1990-01-01';
+  const gen = gender || 'Male';
+  const nat = nationality || 'Pakistan';
   const subCat = subCategory || 'General';
-  const mob = phone || '';
-  const mail = email || '';
+  const mob = phone || '+923001234567';
+  const mail = email || 'account01@gvcworld-test.com';
+  const user = username || 'Account01';
+  const pwd = password || 'Swift@001';
 
   try {
     const query = `
-      INSERT INTO applicants (id, given_name, surname, passport_number, passport_expiry, dob, vac, category, sub_category, phone, email)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+      INSERT INTO applicants (id, given_name, surname, passport_number, passport_expiry, passport_issue, passport_place, dob, gender, nationality, vac, category, sub_category, phone, email, username, password)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
       RETURNING *
     `;
-    const values = [id, given, sur, pass, exp, birth, vac, category, subCat, mob, mail];
+    const values = [id, given, sur, pass, exp, issue, place, birth, gen, nat, vac, category, subCat, mob, mail, user, pwd];
     const result = await pool.query(query, values);
     const row = result.rows[0];
 
@@ -240,12 +261,18 @@ app.post('/api/applicants', async (req, res) => {
       surname: row.surname,
       passportNumber: row.passport_number,
       passportExpiry: exp,
+      passportIssue: issue,
+      passportPlace: place,
       dob: birth,
+      gender: gen,
+      nationality: nat,
       vac: row.vac,
       category: row.category,
       subCategory: row.sub_category,
       phone: row.phone,
       email: row.email,
+      username: row.username,
+      password: row.password,
       status: row.status,
       createdAt: row.created_at
     };
@@ -257,6 +284,13 @@ app.post('/api/applicants', async (req, res) => {
     broadcastEvent('applicants', allRes.rows.map(r => ({
       id: r.id, givenName: r.given_name, surname: r.surname, passportNumber: r.passport_number, vac: r.vac, category: r.category
     })));
+
+    res.status(201).json({ success: true, applicant: newApplicant });
+  } catch (err) {
+    console.error('[PostgreSQL] Insert applicant error:', err.message);
+    res.status(500).json({ error: 'Failed to save applicant into database: ' + err.message });
+  }
+});
 
     res.status(201).json({ success: true, applicant: newApplicant });
   } catch (err) {
@@ -328,61 +362,56 @@ app.get('/api/scraped-form-schema', (req, res) => {
   res.json(agent.getFormSchema());
 });
 
-// Seed Demo Auto-Apply Profiles
+// Seed Single Official Account Profile (Account01)
 app.post('/api/applicants/seed-demo', async (req, res) => {
-  const demoProfiles = [
-    {
-      id: 'APP-DEMO-01',
-      given_name: 'Muhammad',
-      surname: 'Ali',
-      passport_number: 'PK9842104',
-      passport_expiry: '2031-08-15',
-      dob: '1992-05-12',
-      vac: 'Islamabad VAC',
-      category: 'Schengen Short Stay (Type C)',
-      sub_category: 'Tourism & Business',
-      phone: '+923001234567',
-      email: 'm.ali.demo@gvcworld-test.com'
-    },
-    {
-      id: 'APP-DEMO-02',
-      given_name: 'Fatima',
-      surname: 'Zahra',
-      passport_number: 'PK4720193',
-      passport_expiry: '2030-11-20',
-      dob: '1995-10-04',
-      vac: 'Lahore VAC',
-      category: 'National Long Stay (Type D)',
-      sub_category: 'Work & Family Reunion',
-      phone: '+923219876543',
-      email: 'f.zahra.demo@gvcworld-test.com'
-    }
-  ];
+  const officialProfile = {
+    id: 'APP-OFFICIAL-01',
+    given_name: 'Muhammad',
+    surname: 'Ali',
+    passport_number: 'PK9842104',
+    passport_expiry: '2031-08-15',
+    passport_issue: '2021-08-15',
+    passport_place: 'Islamabad',
+    dob: '1992-05-12',
+    gender: 'Male',
+    nationality: 'Pakistan',
+    vac: 'Islamabad VAC',
+    category: 'Schengen Short Stay (Type C)',
+    sub_category: 'Tourism & Business',
+    phone: '+923001234567',
+    email: 'account01@gvcworld-portal.com',
+    username: 'Account01',
+    password: 'Swift@001'
+  };
 
   try {
-    for (const p of demoProfiles) {
-      await pool.query(`
-        INSERT INTO applicants (id, given_name, surname, passport_number, passport_expiry, dob, vac, category, sub_category, phone, email)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
-        ON CONFLICT (id) DO UPDATE SET
-          given_name = EXCLUDED.given_name,
-          surname = EXCLUDED.surname,
-          passport_number = EXCLUDED.passport_number,
-          vac = EXCLUDED.vac,
-          category = EXCLUDED.category
-      `, [p.id, p.given_name, p.surname, p.passport_number, p.passport_expiry, p.dob, p.vac, p.category, p.sub_category, p.phone, p.email]);
-    }
+    // Clear demo profiles first
+    await pool.query("DELETE FROM applicants WHERE id LIKE 'APP-DEMO%' OR id LIKE 'APP-OFFICIAL%'");
 
-    agent.addLog('SYSTEM', 'Seed demo profiles added to Neon PostgreSQL database.');
+    const p = officialProfile;
+    await pool.query(`
+      INSERT INTO applicants (id, given_name, surname, passport_number, passport_expiry, passport_issue, passport_place, dob, gender, nationality, vac, category, sub_category, phone, email, username, password)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
+      ON CONFLICT (id) DO UPDATE SET
+        given_name = EXCLUDED.given_name,
+        surname = EXCLUDED.surname,
+        passport_number = EXCLUDED.passport_number,
+        vac = EXCLUDED.vac,
+        category = EXCLUDED.category,
+        username = EXCLUDED.username,
+        password = EXCLUDED.password
+    `, [p.id, p.given_name, p.surname, p.passport_number, p.passport_expiry, p.passport_issue, p.passport_place, p.dob, p.gender, p.nationality, p.vac, p.category, p.sub_category, p.phone, p.email, p.username, p.password]);
+
+    agent.addLog('SYSTEM', 'Single official Account01 profile seeded cleanly in Neon PostgreSQL.');
 
     const allRes = await pool.query('SELECT * FROM applicants ORDER BY created_at DESC');
     broadcastEvent('applicants', allRes.rows.map(r => ({
       id: r.id, givenName: r.given_name, surname: r.surname, passportNumber: r.passport_number, vac: r.vac, category: r.category
     })));
 
-    res.json({ success: true, message: 'Demo applicant profiles seeded successfully!' });
+    res.json({ success: true, message: 'Official Account01 profile created successfully!' });
   } catch (err) {
-    res.status(500).json({ error: 'Failed to seed demo profiles: ' + err.message });
+    res.status(500).json({ error: 'Failed to seed official profile: ' + err.message });
   }
 });
 

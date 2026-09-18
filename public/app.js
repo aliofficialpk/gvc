@@ -574,10 +574,17 @@ function closeApplicantModal() {
 async function saveApplicant(e) {
   e.preventDefault();
   const payload = {
+    username: document.getElementById('inputUsername')?.value || 'Account01',
+    password: document.getElementById('inputPassword')?.value || 'Swift@001',
     givenName: document.getElementById('inputGivenName').value,
     surname: document.getElementById('inputSurname').value,
+    dob: document.getElementById('inputDob')?.value || '1992-05-12',
+    gender: document.getElementById('selectGender')?.value || 'Male',
+    nationality: document.getElementById('inputNationality')?.value || 'Pakistan',
     passportNumber: document.getElementById('inputPassportNumber').value,
+    passportIssue: document.getElementById('inputPassportIssue')?.value || '2020-01-01',
     passportExpiry: document.getElementById('inputPassportExpiry').value,
+    passportPlace: document.getElementById('inputPassportPlace')?.value || 'Islamabad',
     vac: document.getElementById('selectVac').value,
     category: document.getElementById('selectCategory').value,
     phone: document.getElementById('inputPhone').value,

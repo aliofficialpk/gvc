@@ -308,40 +308,89 @@
 
   </main>
 
-  <!-- Add Applicant Modal -->
+  <!-- Add Applicant Modal (Complete Field Support) -->
   <div id="applicantModal" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm hidden flex items-center justify-center p-4">
-    <div class="bg-white border border-gray-200 rounded-lg max-w-md w-full p-6 space-y-4 shadow-xl relative">
+    <div class="bg-white border border-gray-200 rounded-lg max-w-lg w-full p-6 space-y-4 shadow-xl relative max-h-[90vh] overflow-y-auto">
       <div class="flex items-center justify-between pb-3 border-b border-gray-200">
         <h3 class="text-base font-bold text-gray-900 flex items-center gap-2">
           <i data-lucide="user-plus" class="w-4 h-4 text-emerald-600"></i>
-          Add Applicant Profile
+          Add Full Applicant Profile (GVC Auto-Apply)
         </h3>
         <button onclick="closeApplicantModal()" class="text-gray-400 hover:text-gray-600"><i data-lucide="x" class="w-5 h-5"></i></button>
       </div>
 
       <form id="formApplicant" onsubmit="saveApplicant(event)" class="space-y-3">
+        
+        <!-- Account Credentials Section -->
+        <div class="bg-indigo-50 p-3 rounded-md border border-indigo-100 space-y-2">
+          <div class="text-xs font-bold text-indigo-900 flex items-center gap-1">
+            <i data-lucide="key" class="w-3.5 h-3.5 text-indigo-600"></i>
+            GVC Portal Login Credentials
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-[11px] font-medium text-gray-700 mb-0.5">Username / Email *</label>
+              <input type="text" id="inputUsername" required value="Account01" placeholder="e.g. Account01" class="input-field">
+            </div>
+            <div>
+              <label class="block text-[11px] font-medium text-gray-700 mb-0.5">Portal Password *</label>
+              <input type="password" id="inputPassword" required value="Swift@001" placeholder="e.g. Swift@001" class="input-field">
+            </div>
+          </div>
+        </div>
+
+        <!-- Personal Details -->
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block text-xs font-medium text-gray-700 mb-1">Given Name *</label>
+            <label class="block text-xs font-medium text-gray-700 mb-1">Given Name (as in Passport) *</label>
             <input type="text" id="inputGivenName" required placeholder="e.g. Muhammad" class="input-field">
           </div>
           <div>
-            <label class="block text-xs font-medium text-gray-700 mb-1">Surname *</label>
+            <label class="block text-xs font-medium text-gray-700 mb-1">Surname / Family Name *</label>
             <input type="text" id="inputSurname" required placeholder="e.g. Ali" class="input-field">
           </div>
         </div>
 
-        <div class="grid grid-cols-2 gap-3">
+        <div class="grid grid-cols-3 gap-3">
+          <div>
+            <label class="block text-xs font-medium text-gray-700 mb-1">Date of Birth *</label>
+            <input type="date" id="inputDob" required value="1992-05-12" class="input-field">
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-gray-700 mb-1">Gender *</label>
+            <select id="selectGender" class="input-field">
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-gray-700 mb-1">Nationality *</label>
+            <input type="text" id="inputNationality" required value="Pakistan" class="input-field">
+          </div>
+        </div>
+
+        <!-- Passport Information -->
+        <div class="grid grid-cols-3 gap-3">
           <div>
             <label class="block text-xs font-medium text-gray-700 mb-1">Passport Number *</label>
             <input type="text" id="inputPassportNumber" required placeholder="e.g. ED1234567" class="input-field uppercase">
           </div>
           <div>
-            <label class="block text-xs font-medium text-gray-700 mb-1">Passport Expiry</label>
-            <input type="date" id="inputPassportExpiry" value="2030-01-01" class="input-field">
+            <label class="block text-xs font-medium text-gray-700 mb-1">Issue Date</label>
+            <input type="date" id="inputPassportIssue" value="2020-01-01" class="input-field">
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-gray-700 mb-1">Expiry Date *</label>
+            <input type="date" id="inputPassportExpiry" required value="2030-01-01" class="input-field">
           </div>
         </div>
 
+        <div>
+          <label class="block text-xs font-medium text-gray-700 mb-1">Place of Issue</label>
+          <input type="text" id="inputPassportPlace" value="Islamabad" placeholder="e.g. Islamabad" class="input-field">
+        </div>
+
+        <!-- Visa Category Selection -->
         <div class="grid grid-cols-2 gap-3">
           <div>
             <label class="block text-xs font-medium text-gray-700 mb-1">Visa Application Centre *</label>
@@ -359,14 +408,21 @@
           </div>
         </div>
 
-        <div>
-          <label class="block text-xs font-medium text-gray-700 mb-1">Mobile Phone (Optional)</label>
-          <input type="tel" id="inputPhone" placeholder="+923001234567" class="input-field">
+        <!-- Contact Information -->
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-medium text-gray-700 mb-1">Mobile Phone (for OTP) *</label>
+            <input type="tel" id="inputPhone" required placeholder="+923001234567" class="input-field">
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-gray-700 mb-1">Email Address *</label>
+            <input type="email" id="inputEmail" required placeholder="account01@gvcworld-test.com" class="input-field">
+          </div>
         </div>
 
-        <div class="pt-2 flex justify-end space-x-2">
+        <div class="pt-2 flex justify-end space-x-2 border-t border-gray-100">
           <button type="button" onclick="closeApplicantModal()" class="px-3.5 py-1.5 text-xs font-medium text-gray-600 hover:text-gray-800">Cancel</button>
-          <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-1.5 rounded-md text-xs font-semibold shadow-sm">Save Profile</button>
+          <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-1.5 rounded-md text-xs font-bold shadow-sm">Save Full Profile</button>
         </div>
       </form>
     </div>
