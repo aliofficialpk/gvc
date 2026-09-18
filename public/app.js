@@ -612,9 +612,6 @@ function closeStageAuditModal() {
   if (modal) modal.classList.add('hidden');
 }
 
-  if (window.lucide) lucide.createIcons();
-}
-
 async function refreshHistory() {
   await fetchHistory();
 }
