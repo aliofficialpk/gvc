@@ -292,13 +292,6 @@ app.post('/api/applicants', async (req, res) => {
   }
 });
 
-    res.status(201).json({ success: true, applicant: newApplicant });
-  } catch (err) {
-    console.error('[PostgreSQL] Insert applicant error:', err.message);
-    res.status(500).json({ error: 'Failed to save applicant into database: ' + err.message });
-  }
-});
-
 app.delete('/api/applicants/:id', async (req, res) => {
   const { id } = req.params;
   try {
