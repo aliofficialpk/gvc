@@ -741,20 +741,38 @@ function prefillFullSampleData() {
 
   if (get('inputEuFamilyMember')) get('inputEuFamilyMember').value = 'N/A';
 
-  if (get('inputHomeAddress')) get('inputHomeAddress').value = 'House 123, Street 45, Sector F-8/2, Islamabad';
-  if (get('selectResidenceOtherCountry')) get('selectResidenceOtherCountry').value = 'No';
+  // Section 5 Residence (19.1 - 20.1)
+  if (get('selectResidenceCountry')) get('selectResidenceCountry').value = 'PAKISTAN';
+  if (get('inputResidenceCity')) get('inputResidenceCity').value = 'Islamabad';
+  if (get('inputResidenceAddress')) get('inputResidenceAddress').value = 'House 123, Street 45, Sector F-8/2';
+  if (get('inputResidencePostal')) get('inputResidencePostal').value = '44000';
+  if (get('inputResidenceEmail')) get('inputResidenceEmail').value = 'account01@gvcworld-portal.com';
+  if (get('inputResidencePhone')) get('inputResidencePhone').value = '+92511234567';
+  if (get('inputResidenceMobile')) get('inputResidenceMobile').value = '+923001234567';
+  if (get('selectCourierSameAddress')) get('selectCourierSameAddress').value = 'Yes';
+  if (get('selectResidenceOtherCountryName')) get('selectResidenceOtherCountryName').value = 'N/A';
 
-  if (get('inputOccupation')) get('inputOccupation').value = 'Software Engineer / Business Manager';
-  if (get('inputEmployerInfo')) get('inputEmployerInfo').value = 'Tech Solutions Ltd, Blue Area Islamabad, Tel: +92511234567';
+  // Section 6 Occupation (21 - 22.5)
+  if (get('selectOccupation')) get('selectOccupation').value = 'SOFTWARE ENGINEER';
+  if (get('inputEmployerName')) get('inputEmployerName').value = 'Tech Solutions Ltd';
+  if (get('inputEmployerStreet')) get('inputEmployerStreet').value = 'Blue Area, Jinnah Avenue';
+  if (get('inputEmployerPostal')) get('inputEmployerPostal').value = '44000';
+  if (get('inputEmployerCity')) get('inputEmployerCity').value = 'Islamabad';
+  if (get('selectEmployerCountry')) get('selectEmployerCountry').value = 'PAKISTAN';
 
+  // Section 7 Travel Info (23.1 - 27.2)
   if (get('selectVac')) get('selectVac').value = 'Islamabad VAC';
   if (get('selectCategory')) get('selectCategory').value = 'Schengen Visa (Short Stay Type C)';
-  if (get('selectSubCategory')) get('selectSubCategory').value = 'Tourism & Private Family Visit (Schengen C)';
-  if (get('inputMainDestination')) get('inputMainDestination').value = 'Greece';
-  if (get('inputFirstEntry')) get('inputFirstEntry').value = 'Greece';
-  if (get('selectEntriesRequested')) get('selectEntriesRequested').value = 'Single Entry';
-  if (get('inputIntendedArrival')) get('inputIntendedArrival').value = '2026-10-15';
-  if (get('inputIntendedDeparture')) get('inputIntendedDeparture').value = '2026-10-30';
+  if (get('selectTravelPurpose')) get('selectTravelPurpose').value = 'TOURISM';
+  if (get('inputOtherPurpose')) get('inputOtherPurpose').value = 'Other';
+  if (get('inputPurposeAdditionalInfo')) get('inputPurposeAdditionalInfo').value = 'Sightseeing & Tourist Visit';
+  if (get('selectDestinationState1')) get('selectDestinationState1').value = 'GREECE';
+  if (get('inputDestinationState2')) get('inputDestinationState2').value = '';
+  if (get('selectFirstEntryState')) get('selectFirstEntryState').value = 'GREECE';
+  if (get('selectEntriesRequested')) get('selectEntriesRequested').value = 'SINGLE';
+  if (get('inputIntendedArrivalDate')) get('inputIntendedArrivalDate').value = '2026-10-15';
+  if (get('inputIntendedDepartureDate')) get('inputIntendedDepartureDate').value = '2026-10-30';
+  if (get('inputDurationOfStayDays')) get('inputDurationOfStayDays').value = '15';
 
   if (get('selectFingerprintsCollected')) get('selectFingerprintsCollected').value = 'No';
   if (get('selectEntryPermitFinal')) get('selectEntryPermitFinal').value = 'N/A';
@@ -775,7 +793,7 @@ function prefillFullSampleData() {
   if (get('selectInsuranceDeclaration')) get('selectInsuranceDeclaration').value = 'Yes - 100% Compliant Schengen Insurance (Min 30,000 EUR Coverage)';
   if (get('checkAccuracyConfirmation')) get('checkAccuracyConfirmation').checked = true;
 
-  alert('✨ All 33 compulsory fields pre-filled with 100% compliant sample data!');
+  alert('✨ All sub-numbered fields pre-filled with 100% compliant live portal sample data!');
 }
 
 function openApplicantModal() {
@@ -819,20 +837,35 @@ async function saveApplicant(e) {
 
     euFamilyMember: val('inputEuFamilyMember'),
 
-    homeAddress: val('inputHomeAddress'),
-    residenceOtherCountry: val('selectResidenceOtherCountry'),
+    residenceCountry: val('selectResidenceCountry'),
+    residenceCity: val('inputResidenceCity'),
+    residenceAddress: val('inputResidenceAddress'),
+    residencePostal: val('inputResidencePostal'),
+    residenceEmail: val('inputResidenceEmail'),
+    residencePhone: val('inputResidencePhone'),
+    residenceMobile: val('inputResidenceMobile'),
+    courierSameAddress: val('selectCourierSameAddress'),
+    residenceOtherCountryName: val('selectResidenceOtherCountryName'),
 
-    occupation: val('inputOccupation'),
-    employerInfo: val('inputEmployerInfo'),
+    occupation: val('selectOccupation'),
+    employerName: val('inputEmployerName'),
+    employerStreet: val('inputEmployerStreet'),
+    employerPostal: val('inputEmployerPostal'),
+    employerCity: val('inputEmployerCity'),
+    employerCountry: val('selectEmployerCountry'),
 
     vac: val('selectVac'),
     category: val('selectCategory'),
-    subCategory: val('selectSubCategory'),
-    mainDestination: val('inputMainDestination'),
-    firstEntry: val('inputFirstEntry'),
+    travelPurpose: val('selectTravelPurpose'),
+    otherPurpose: val('inputOtherPurpose'),
+    purposeAdditionalInfo: val('inputPurposeAdditionalInfo'),
+    destinationState1: val('selectDestinationState1'),
+    destinationState2: val('inputDestinationState2'),
+    firstEntryState: val('selectFirstEntryState'),
     entriesRequested: val('selectEntriesRequested'),
-    intendedArrival: val('inputIntendedArrival'),
-    intendedDeparture: val('inputIntendedDeparture'),
+    intendedArrivalDate: val('inputIntendedArrivalDate'),
+    intendedDepartureDate: val('inputIntendedDepartureDate'),
+    durationOfStayDays: val('inputDurationOfStayDays'),
 
     fingerprintsCollected: val('selectFingerprintsCollected'),
     entryPermitFinal: val('selectEntryPermitFinal'),
@@ -868,7 +901,7 @@ async function saveApplicant(e) {
     passportPlace: fullFormData.passportPlace,
     vac: fullFormData.vac,
     category: fullFormData.category,
-    subCategory: fullFormData.subCategory,
+    subCategory: fullFormData.travelPurpose,
     phone: fullFormData.phone,
     email: fullFormData.email,
     fullFormData

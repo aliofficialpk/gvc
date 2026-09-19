@@ -505,38 +505,111 @@
             </div>
           </div>
 
-          <!-- TAB 5: Residence (19,20) -->
+          <!-- TAB 5: Residence (19,20) - [Live Screenshots 4 & 5] -->
           <div id="secResidence" class="modal-sec-panel hidden space-y-3">
-            <h4 class="font-bold text-gray-900 border-b pb-1">5. Residence Details (Fields 19, 20)</h4>
-            <div>
-              <label class="block font-medium text-gray-700 mb-1">19. Applicant Home Address (Street, City, Postal Code) *</label>
-              <input type="text" id="inputHomeAddress" value="House 123, Street 45, Sector F-8/2, Islamabad" placeholder="Full home address in Pakistan" class="input-field">
+            <h4 class="font-bold text-gray-900 border-b pb-1">5. Residence Details (Fields 19.1 to 19.7 & 20.1)</h4>
+            <div class="grid grid-cols-3 gap-3">
+              <div>
+                <label class="block font-medium text-gray-700 mb-1">19.1 Country *</label>
+                <select id="selectResidenceCountry" class="input-field">
+                  <option value="PAKISTAN">PAKISTAN</option>
+                </select>
+              </div>
+              <div>
+                <label class="block font-medium text-gray-700 mb-1">19.2 City *</label>
+                <input type="text" id="inputResidenceCity" value="Islamabad" placeholder="e.g. Islamabad" class="input-field">
+              </div>
+              <div>
+                <label class="block font-medium text-gray-700 mb-1">19.4 Postal Code *</label>
+                <input type="text" id="inputResidencePostal" value="44000" placeholder="e.g. 44000" class="input-field font-mono">
+              </div>
             </div>
+
             <div>
-              <label class="block font-medium text-gray-700 mb-1">20. Residence in Country Other Than Current Nationality *</label>
-              <select id="selectResidenceOtherCountry" class="input-field">
-                <option value="No">No</option>
-                <option value="Yes">Yes (Provide Residence Permit Details)</option>
+              <label class="block font-medium text-gray-700 mb-1">19.3 Address (Street, House Number, Apartment) *</label>
+              <input type="text" id="inputResidenceAddress" value="House 123, Street 45, Sector F-8/2" placeholder="Street Address" class="input-field">
+            </div>
+
+            <div class="grid grid-cols-3 gap-3">
+              <div>
+                <label class="block font-medium text-gray-700 mb-1">19.5 Email Address *</label>
+                <input type="email" id="inputResidenceEmail" value="account01@gvcworld-portal.com" placeholder="email@domain.com" class="input-field">
+              </div>
+              <div>
+                <label class="block font-medium text-gray-700 mb-1">19.6 Phone Number *</label>
+                <input type="tel" id="inputResidencePhone" value="+92511234567" placeholder="+92511234567" class="input-field font-mono">
+              </div>
+              <div>
+                <label class="block font-medium text-gray-700 mb-1">19.7 Mobile Number</label>
+                <input type="tel" id="inputResidenceMobile" value="+923001234567" placeholder="+923001234567" class="input-field font-mono">
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 pt-1 border-t border-gray-100">
+              <div>
+                <label class="block font-medium text-gray-700 mb-1">Same Address for Courier Delivery?</label>
+                <select id="selectCourierSameAddress" class="input-field">
+                  <option value="Yes">Yes</option>
+                  <option value="No">No</option>
+                </select>
+              </div>
+              <div>
+                <label class="block font-medium text-gray-700 mb-1">20.1 Country (Residence in Country Other Than Nationality)</label>
+                <select id="selectResidenceOtherCountryName" class="input-field">
+                  <option value="N/A">N/A (Not Applicable)</option>
+                  <option value="PAKISTAN">PAKISTAN</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- TAB 6: Occupation or School (21,22) - [Live Screenshot 3] -->
+          <div id="secOccupation" class="modal-sec-panel hidden space-y-3">
+            <h4 class="font-bold text-gray-900 border-b pb-1">6. Occupation & Employer Details (Fields 21 to 22.5)</h4>
+            <div>
+              <label class="block font-medium text-gray-700 mb-1">21. Current Occupation *</label>
+              <select id="selectOccupation" class="input-field">
+                <option value="SOFTWARE ENGINEER">SOFTWARE ENGINEER</option>
+                <option value="BUSINESS MANAGER">BUSINESS MANAGER</option>
+                <option value="COMPANY DIRECTOR">COMPANY DIRECTOR</option>
+                <option value="STUDENT">STUDENT</option>
+                <option value="SELF EMPLOYED">SELF EMPLOYED</option>
+                <option value="OTHER">OTHER</option>
               </select>
             </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block font-medium text-gray-700 mb-1">22.1 Employer's or School's Name *</label>
+                <input type="text" id="inputEmployerName" value="Tech Solutions Ltd" placeholder="Employer Name" class="input-field">
+              </div>
+              <div>
+                <label class="block font-medium text-gray-700 mb-1">22.2 Employer's or School's Street Address *</label>
+                <input type="text" id="inputEmployerStreet" value="Blue Area, Jinnah Avenue" placeholder="Street Address" class="input-field">
+              </div>
+            </div>
+
+            <div class="grid grid-cols-3 gap-3">
+              <div>
+                <label class="block font-medium text-gray-700 mb-1">22.3 Employer's or School's Postal Code *</label>
+                <input type="text" id="inputEmployerPostal" value="44000" placeholder="44000" class="input-field font-mono">
+              </div>
+              <div>
+                <label class="block font-medium text-gray-700 mb-1">22.4 Employer's or School's City *</label>
+                <input type="text" id="inputEmployerCity" value="Islamabad" placeholder="City" class="input-field">
+              </div>
+              <div>
+                <label class="block font-medium text-gray-700 mb-1">22.5 Employer's or School's Country *</label>
+                <select id="selectEmployerCountry" class="input-field">
+                  <option value="PAKISTAN">PAKISTAN</option>
+                </select>
+              </div>
+            </div>
           </div>
 
-          <!-- TAB 6: Occupation or School (21,22) -->
-          <div id="secOccupation" class="modal-sec-panel hidden space-y-3">
-            <h4 class="font-bold text-gray-900 border-b pb-1">6. Occupation or School (Fields 21, 22)</h4>
-            <div>
-              <label class="block font-medium text-gray-700 mb-1">21. Current Occupation / Job Title *</label>
-              <input type="text" id="inputOccupation" value="Software Engineer / Business Manager" placeholder="e.g. Software Engineer" class="input-field">
-            </div>
-            <div>
-              <label class="block font-medium text-gray-700 mb-1">22. Employer / Educational Establishment (Name, Address, Tel) *</label>
-              <input type="text" id="inputEmployerInfo" value="Tech Solutions Ltd, Blue Area Islamabad, Tel: +92511234567" placeholder="Employer details" class="input-field">
-            </div>
-          </div>
-
-          <!-- TAB 7: Travel Information (23-27) -->
+          <!-- TAB 7: Travel Information (23-27) - [Live Screenshots 1 & 2] -->
           <div id="secTravel" class="modal-sec-panel hidden space-y-3">
-            <h4 class="font-bold text-gray-900 border-b pb-1">7. Travel Information (Fields 23 to 27)</h4>
+            <h4 class="font-bold text-gray-900 border-b pb-1">7. Travel Information (Fields 23.1 to 27.2)</h4>
             <div class="grid grid-cols-3 gap-3">
               <div>
                 <label class="block font-medium text-gray-700 mb-1">Visa Application Centre *</label>
@@ -554,55 +627,71 @@
                   <option value="National Work Visa (Type D Employment)">National Work Visa (Type D Employment)</option>
                   <option value="Prime Time Appointment Slot">Prime Time Appointment Slot</option>
                   <option value="Premium Lounge Service Appointment">Premium Lounge Service Appointment</option>
-                  <option value="EU / EEA Family Member Visa">EU / EEA Family Member Visa</option>
-                  <option value="Seamen & Maritime Transit Visa">Seamen & Maritime Transit Visa</option>
-                  <option value="Golden Visa & Real Estate Investment">Golden Visa & Real Estate Investment</option>
                 </select>
               </div>
               <div>
-                <label class="block font-medium text-gray-700 mb-1">23. Main Purpose of Journey *</label>
-                <select id="selectSubCategory" class="input-field">
-                  <option value="Tourism & Private Family Visit (Schengen C)">Tourism & Private Family Visit (Schengen C)</option>
-                  <option value="National Work & Employment Contract (Type D)">National Work & Employment Contract (Type D)</option>
-                  <option value="Business, Commercial & Conference">Business, Commercial & Conference</option>
-                  <option value="Prime Time Booking Slot (Out of Hours)">Prime Time Booking Slot (Out of Hours)</option>
-                  <option value="Premium Lounge VIP Service">Premium Lounge VIP Service</option>
-                  <option value="Seasonal Agricultural & Aquatic Work">Seasonal Agricultural & Aquatic Work</option>
-                  <option value="Higher Education & University Studies">Higher Education & University Studies</option>
-                  <option value="Family Reunification (Type D)">Family Reunification (Type D)</option>
-                  <option value="Financially Independent Persons (FIP)">Financially Independent Persons (FIP)</option>
-                  <option value="Medical Treatment & Health Care">Medical Treatment & Health Care</option>
-                  <option value="Airport Transit & Seamen Transit">Airport Transit & Seamen Transit</option>
+                <label class="block font-medium text-gray-700 mb-1">23.1 Main Purpose of Journey - Travel Purpose *</label>
+                <select id="selectTravelPurpose" class="input-field">
+                  <option value="TOURISM">TOURISM</option>
+                  <option value="BUSINESS">BUSINESS</option>
+                  <option value="WORK">WORK</option>
+                  <option value="STUDY">STUDY</option>
+                  <option value="FAMILY VISIT">FAMILY VISIT</option>
                 </select>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block font-medium text-gray-700 mb-1">23.2.1 Other Purpose 1</label>
+                <input type="text" id="inputOtherPurpose" value="Other" placeholder="Other" class="input-field">
+              </div>
+              <div>
+                <label class="block font-medium text-gray-700 mb-1">24. Additional Information on Purpose of Stay</label>
+                <input type="text" id="inputPurposeAdditionalInfo" value="Sightseeing & Tourist Visit" placeholder="Additional Info" class="input-field">
               </div>
             </div>
 
             <div class="grid grid-cols-4 gap-3">
               <div>
-                <label class="block font-medium text-gray-700 mb-1">24. Main Destination *</label>
-                <input type="text" id="inputMainDestination" value="Greece" placeholder="Greece" class="input-field">
-              </div>
-              <div>
-                <label class="block font-medium text-gray-700 mb-1">25. First Entry State *</label>
-                <input type="text" id="inputFirstEntry" value="Greece" placeholder="Greece" class="input-field">
-              </div>
-              <div>
-                <label class="block font-medium text-gray-700 mb-1">26. Entries Requested *</label>
-                <select id="selectEntriesRequested" class="input-field">
-                  <option value="Single Entry">Single Entry</option>
-                  <option value="Two Entries">Two Entries</option>
-                  <option value="Multiple Entries">Multiple Entries</option>
+                <label class="block font-medium text-gray-700 mb-1">25.1 Member State 1 *</label>
+                <select id="selectDestinationState1" class="input-field">
+                  <option value="GREECE">GREECE</option>
                 </select>
               </div>
               <div>
-                <label class="block font-medium text-gray-700 mb-1">27a. Intended Arrival *</label>
-                <input type="date" id="inputIntendedArrival" value="2026-10-15" class="input-field">
+                <label class="block font-medium text-gray-700 mb-1">25.2 Member State 2</label>
+                <input type="text" id="inputDestinationState2" value="" placeholder="N/A" class="input-field">
+              </div>
+              <div>
+                <label class="block font-medium text-gray-700 mb-1">26. Member State of First Entry *</label>
+                <select id="selectFirstEntryState" class="input-field">
+                  <option value="GREECE">GREECE</option>
+                </select>
+              </div>
+              <div>
+                <label class="block font-medium text-gray-700 mb-1">27. Number of Entries Requested *</label>
+                <select id="selectEntriesRequested" class="input-field">
+                  <option value="SINGLE">SINGLE</option>
+                  <option value="TWO">TWO</option>
+                  <option value="MULTIPLE">MULTIPLE</option>
+                </select>
               </div>
             </div>
 
-            <div>
-              <label class="block font-medium text-gray-700 mb-1">27b. Intended Departure *</label>
-              <input type="date" id="inputIntendedDeparture" value="2026-10-30" class="input-field">
+            <div class="grid grid-cols-3 gap-3">
+              <div>
+                <label class="block font-medium text-gray-700 mb-1">27.0 Intended Date of First Arrival *</label>
+                <input type="date" id="inputIntendedArrivalDate" value="2026-10-15" class="input-field">
+              </div>
+              <div>
+                <label class="block font-medium text-gray-700 mb-1">27.1 Intended Date of Departure *</label>
+                <input type="date" id="inputIntendedDepartureDate" value="2026-10-30" class="input-field">
+              </div>
+              <div>
+                <label class="block font-medium text-gray-700 mb-1">27.2 Duration of Stay (in days) *</label>
+                <input type="number" id="inputDurationOfStayDays" value="15" placeholder="15" class="input-field font-mono">
+              </div>
             </div>
           </div>
 

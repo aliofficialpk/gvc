@@ -50,32 +50,47 @@ class MonitorAgent extends EventEmitter {
       // Section 4: EU Family Member (17,18)
       { fieldKey: 'eu_family_member', label: '17,18. EU/EEA or CH Citizen Family Member Details', type: 'text', required: false, stage: '4. EU Family Member (17,18)', gvcSelector: 'input[name="eu_family_member"], #eu_family_member', matchProp: 'euFamilyMember' },
 
-      // Section 5: Residence (19,20)
-      { fieldKey: 'home_address', label: '19. Applicant Home Address (Street, City, Postal Code)', type: 'text', required: true, stage: '5. Residence (19,20)', gvcSelector: 'input[name="address"], #address', matchProp: 'homeAddress' },
-      { fieldKey: 'residence_other_country', label: '20. Residence in Other Country', type: 'select', required: true, options: ['No', 'Yes'], stage: '5. Residence (19,20)', gvcSelector: 'select[name="residence_other"], #residence_other', matchProp: 'residenceOtherCountry' },
+      // Section 5: Residence (19,20) - [Live Screenshots 4 & 5]
+      { fieldKey: 'residence_country', label: '19.1 Country *', type: 'select', required: true, options: ['PAKISTAN'], stage: '5. Residence (19,20)', gvcSelector: 'select[name="residence_country"], #residence_country', matchProp: 'residenceCountry' },
+      { fieldKey: 'residence_city', label: '19.2 City *', type: 'text', required: true, stage: '5. Residence (19,20)', gvcSelector: 'input[name="residence_city"], #residence_city', matchProp: 'residenceCity' },
+      { fieldKey: 'residence_address', label: '19.3 Address (Street, House Number, Apartment) *', type: 'text', required: true, stage: '5. Residence (19,20)', gvcSelector: 'input[name="residence_address"], #residence_address', matchProp: 'residenceAddress' },
+      { fieldKey: 'residence_postal', label: '19.4 Postal Code *', type: 'text', required: true, stage: '5. Residence (19,20)', gvcSelector: 'input[name="residence_postal"], #residence_postal', matchProp: 'residencePostal' },
+      { fieldKey: 'residence_email', label: '19.5 Email Address *', type: 'email', required: true, stage: '5. Residence (19,20)', gvcSelector: 'input[name="residence_email"], #residence_email', matchProp: 'residenceEmail' },
+      { fieldKey: 'residence_phone', label: '19.6 Phone Number *', type: 'tel', required: true, stage: '5. Residence (19,20)', gvcSelector: 'input[name="residence_phone"], #residence_phone', matchProp: 'residencePhone' },
+      { fieldKey: 'residence_mobile', label: '19.7 Mobile Number', type: 'tel', required: false, stage: '5. Residence (19,20)', gvcSelector: 'input[name="residence_mobile"], #residence_mobile', matchProp: 'residenceMobile' },
+      { fieldKey: 'courier_same_address', label: 'Same Address for Courier Delivery?', type: 'select', required: true, options: ['Yes', 'No'], stage: '5. Residence (19,20)', gvcSelector: 'select[name="courier_same"], #courier_same', matchProp: 'courierSameAddress' },
+      { fieldKey: 'residence_other_country_name', label: '20.1 Country (Residence in Country Other than Current Nationality)', type: 'select', required: false, stage: '5. Residence (19,20)', gvcSelector: 'select[name="residence_other_country"], #residence_other_country', matchProp: 'residenceOtherCountryName' },
 
-      // Section 6: Occupation or School (21,22)
-      { fieldKey: 'occupation', label: '21. Current Occupation / Job Title', type: 'text', required: true, stage: '6. Occupation or School (21,22)', gvcSelector: 'input[name="occupation"], #occupation', matchProp: 'occupation' },
-      { fieldKey: 'employer_info', label: '22. Employer / Educational Establishment Name, Address & Tel', type: 'text', required: true, stage: '6. Occupation or School (21,22)', gvcSelector: 'input[name="employer_info"], #employer_info', matchProp: 'employerInfo' },
+      // Section 6: Occupation or School (21,22) - [Live Screenshot 3]
+      { fieldKey: 'occupation', label: '21. Current Occupation *', type: 'select', required: true, stage: '6. Occupation or School (21,22)', gvcSelector: 'select[name="occupation"], #occupation', matchProp: 'occupation' },
+      { fieldKey: 'employer_name', label: "22.1 Employer's or School's Name *", type: 'text', required: true, stage: '6. Occupation or School (21,22)', gvcSelector: 'input[name="employer_name"], #employer_name', matchProp: 'employerName' },
+      { fieldKey: 'employer_street', label: "22.2 Employer's or School's Street Address *", type: 'text', required: true, stage: '6. Occupation or School (21,22)', gvcSelector: 'input[name="employer_street"], #employer_street', matchProp: 'employerStreet' },
+      { fieldKey: 'employer_postal', label: "22.3 Employer's or School's Postal Code *", type: 'text', required: true, stage: '6. Occupation or School (21,22)', gvcSelector: 'input[name="employer_postal"], #employer_postal', matchProp: 'employerPostal' },
+      { fieldKey: 'employer_city', label: "22.4 Employer's or School's City *", type: 'text', required: true, stage: '6. Occupation or School (21,22)', gvcSelector: 'input[name="employer_city"], #employer_city', matchProp: 'employerCity' },
+      { fieldKey: 'employer_country', label: "22.5 Employer's or School's Country *", type: 'select', required: true, options: ['PAKISTAN'], stage: '6. Occupation or School (21,22)', gvcSelector: 'select[name="employer_country"], #employer_country', matchProp: 'employerCountry' },
 
-      // Section 7: Travel Information (23-27)
+      // Section 7: Travel Information (23-27) - [Live Screenshots 1 & 2]
       { fieldKey: 'vac', label: 'Visa Application Centre (VAC)', type: 'select', required: true, options: ['Islamabad VAC', 'Lahore VAC', 'Karachi VAC'], stage: '7. Travel Information (23-27)', gvcSelector: 'select[name="vac_id"], #vac_id', matchProp: 'vac' },
       { fieldKey: 'category', label: 'Visa Category', type: 'select', required: true, options: ['Schengen Visa (Short Stay Type C)', 'Long Term Visa (National Type D)', 'National Work Visa (Type D Employment)', 'Prime Time Appointment Slot', 'Premium Lounge Service Appointment', 'EU / EEA Family Member Visa', 'Seamen & Maritime Transit Visa', 'Golden Visa & Real Estate Investment'], stage: '7. Travel Information (23-27)', gvcSelector: 'select[name="category_id"], #category_id', matchProp: 'category' },
-      { fieldKey: 'sub_category', label: '23. Main Purpose of Journey', type: 'select', required: true, options: ['National Work & Employment Contract (Type D)', 'Tourism & Private Family Visit (Schengen C)', 'Business, Commercial & Conference', 'Prime Time Booking Slot (Out of Hours)', 'Premium Lounge VIP Service', 'Seasonal Agricultural & Aquatic Work', 'Higher Education & University Studies', 'Family Reunification (Type D)', 'Financially Independent Persons (FIP)', 'Medical Treatment & Health Care', 'Airport Transit & Seamen Transit'], stage: '7. Travel Information (23-27)', gvcSelector: 'select[name="sub_category_id"], #sub_category_id', matchProp: 'subCategory' },
-      { fieldKey: 'main_destination', label: '24. Member State of Main Destination', type: 'text', required: true, stage: '7. Travel Information (23-27)', gvcSelector: 'input[name="main_destination"], #main_destination', matchProp: 'mainDestination' },
-      { fieldKey: 'first_entry', label: '25. Member State of First Entry', type: 'text', required: true, stage: '7. Travel Information (23-27)', gvcSelector: 'input[name="first_entry"], #first_entry', matchProp: 'firstEntry' },
-      { fieldKey: 'entries_requested', label: '26. Number of Entries Requested', type: 'select', required: true, options: ['Single Entry', 'Two Entries', 'Multiple Entries'], stage: '7. Travel Information (23-27)', gvcSelector: 'select[name="entries"], #entries', matchProp: 'entriesRequested' },
-      { fieldKey: 'intended_arrival', label: '27a. Intended Date of Arrival', type: 'date', required: true, stage: '7. Travel Information (23-27)', gvcSelector: 'input[name="arrival_date"], #arrival_date', matchProp: 'intendedArrival' },
-      { fieldKey: 'intended_departure', label: '27b. Intended Date of Departure', type: 'date', required: true, stage: '7. Travel Information (23-27)', gvcSelector: 'input[name="departure_date"], #departure_date', matchProp: 'intendedDeparture' },
+      { fieldKey: 'travel_purpose', label: '23.1 Main Purpose(s) of Journey - Travel Purpose *', type: 'select', required: true, options: ['TOURISM', 'BUSINESS', 'WORK', 'STUDY', 'FAMILY VISIT'], stage: '7. Travel Information (23-27)', gvcSelector: 'select[name="travel_purpose"], #travel_purpose', matchProp: 'travelPurpose' },
+      { fieldKey: 'other_purpose', label: '23.2.1 Other Purpose 1', type: 'text', required: false, stage: '7. Travel Information (23-27)', gvcSelector: 'input[name="other_purpose"], #other_purpose', matchProp: 'otherPurpose' },
+      { fieldKey: 'purpose_additional_info', label: '24. Additional Information on Purpose of Stay', type: 'text', required: false, stage: '7. Travel Information (23-27)', gvcSelector: 'textarea[name="purpose_info"], #purpose_info', matchProp: 'purposeAdditionalInfo' },
+      { fieldKey: 'destination_state_1', label: '25.1 Member State 1 *', type: 'select', required: true, options: ['GREECE'], stage: '7. Travel Information (23-27)', gvcSelector: 'select[name="destination_state_1"], #destination_state_1', matchProp: 'destinationState1' },
+      { fieldKey: 'destination_state_2', label: '25.2 Member State 2', type: 'text', required: false, stage: '7. Travel Information (23-27)', gvcSelector: 'input[name="destination_state_2"], #destination_state_2', matchProp: 'destinationState2' },
+      { fieldKey: 'first_entry_state', label: '26. Member State of First Entry *', type: 'select', required: true, options: ['GREECE'], stage: '7. Travel Information (23-27)', gvcSelector: 'select[name="first_entry_state"], #first_entry_state', matchProp: 'firstEntryState' },
+      { fieldKey: 'entries_requested', label: '27. Number of Entries Requested *', type: 'select', required: true, options: ['SINGLE', 'TWO', 'MULTIPLE'], stage: '7. Travel Information (23-27)', gvcSelector: 'select[name="entries_requested"], #entries_requested', matchProp: 'entriesRequested' },
+      { fieldKey: 'intended_arrival_date', label: '27.0 Intended Date of First Arrival (dd/mm/yyyy) *', type: 'date', required: true, stage: '7. Travel Information (23-27)', gvcSelector: 'input[name="intended_arrival"], #intended_arrival', matchProp: 'intendedArrivalDate' },
+      { fieldKey: 'intended_departure_date', label: '27.1 Intended Date of Departure (dd/mm/yyyy) *', type: 'date', required: true, stage: '7. Travel Information (23-27)', gvcSelector: 'input[name="intended_departure"], #intended_departure', matchProp: 'intendedDepartureDate' },
+      { fieldKey: 'duration_of_stay_days', label: '27.2 Duration of the Intended Stay (in days) *', type: 'number', required: true, stage: '7. Travel Information (23-27)', gvcSelector: 'input[name="duration_days"], #duration_days', matchProp: 'durationOfStayDays' },
 
-      // Section 8: Previous Visas & Permits (28,29) - [Official Screenshot 5]
+      // Section 8: Previous Visas & Permits (28,29)
       { fieldKey: 'fingerprints_collected', label: '28. Fingerprints Collected Previously for Schengen Visa', type: 'select', required: true, options: ['No', 'Yes'], stage: '8. Previous Visas & Permits (28,29)', gvcSelector: 'select[name="fingerprints"], #fingerprints', matchProp: 'fingerprintsCollected' },
       { fieldKey: 'entry_permit_final', label: '29. Entry Permit for Final Destination (if applicable)', type: 'select', required: true, options: ['N/A', 'Yes', 'No'], stage: '8. Previous Visas & Permits (28,29)', gvcSelector: 'select[name="entry_permit"], #entry_permit', matchProp: 'entryPermitFinal' },
 
       // Section 9: Hosting (30,31)
       { fieldKey: 'host_info', label: '30,31. Inviting Person / Host Name, Address, Email & Tel', type: 'text', required: true, stage: '9. Hosting (30,31)', gvcSelector: 'input[name="host_info"], #host_info', matchProp: 'hostInfo' },
 
-      // Section 10: Accommodation (30.2) - [Official Screenshot 4]
+      // Section 10: Accommodation (30.2)
       { fieldKey: 'hotel_name', label: '30.2.1 Hotel/Accommodation Name *', type: 'text', required: true, stage: '10. Accommodation (30.2)', gvcSelector: 'input[name="hotel_name"], #hotel_name', matchProp: 'hotelName' },
       { fieldKey: 'hotel_street', label: '30.2.2 Street *', type: 'text', required: true, stage: '10. Accommodation (30.2)', gvcSelector: 'input[name="hotel_street"], #hotel_street', matchProp: 'hotelStreet' },
       { fieldKey: 'hotel_city', label: '30.2.3 City *', type: 'text', required: true, stage: '10. Accommodation (30.2)', gvcSelector: 'input[name="hotel_city"], #hotel_city', matchProp: 'hotelCity' },
@@ -89,7 +104,7 @@ class MonitorAgent extends EventEmitter {
       // Section 12: Person Filling (33)
       { fieldKey: 'person_filling', label: '33. Person Filling Application', type: 'select', required: true, options: ['Applicant Himself', 'Representative / Agency'], stage: '12. Person Filling (33)', gvcSelector: 'select[name="person_filling"], #person_filling', matchProp: 'personFilling' },
 
-      // Section 13: Travel Medical Insurance (33) - [Official Screenshot 3]
+      // Section 13: Travel Medical Insurance (33)
       { fieldKey: 'insurance_declaration', label: '33. 30,000 EUR Compliant Travel Medical Insurance Declaration', type: 'select', required: true, options: ['Yes - I have 100% compliant Schengen insurance'], stage: '13. Travel Medical Insurance (33)', gvcSelector: 'select[name="insurance_declaration"], #insurance_declaration', matchProp: 'insuranceDeclaration' },
       { fieldKey: 'accuracy_confirmation', label: 'Accuracy Verification Checkbox', type: 'checkbox', required: true, stage: '13. Travel Medical Insurance (33)', gvcSelector: 'input[type="checkbox"]', matchProp: 'accuracyConfirmation' },
 
