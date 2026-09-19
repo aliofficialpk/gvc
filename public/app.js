@@ -695,6 +695,89 @@ async function simulateSlotAlert() {
   } catch(e) {}
 }
 
+function switchModalSection(secId) {
+  const panels = document.querySelectorAll('.modal-sec-panel');
+  panels.forEach(p => p.classList.add('hidden'));
+
+  const activePanel = document.getElementById(secId);
+  if (activePanel) activePanel.classList.remove('hidden');
+
+  const tabs = document.querySelectorAll('.modal-tab');
+  tabs.forEach(t => {
+    t.className = 'modal-tab px-3 py-1.5 rounded-md bg-gray-100 text-gray-700 hover:bg-gray-200 shrink-0';
+  });
+
+  if (window.event && window.event.currentTarget) {
+    window.event.currentTarget.className = 'modal-tab active px-3 py-1.5 rounded-md bg-emerald-600 text-white shadow-sm shrink-0';
+  }
+}
+
+function prefillFullSampleData() {
+  const get = (id) => document.getElementById(id);
+  if (get('inputUsername')) get('inputUsername').value = 'Account01';
+  if (get('inputPassword')) get('inputPassword').value = 'Swift@001';
+  if (get('inputPhone')) get('inputPhone').value = '+923001234567';
+  if (get('inputEmail')) get('inputEmail').value = 'account01@gvcworld-portal.com';
+
+  if (get('inputSurname')) get('inputSurname').value = 'Ali';
+  if (get('inputSurnameAtBirth')) get('inputSurnameAtBirth').value = 'Ali';
+  if (get('inputGivenName')) get('inputGivenName').value = 'Muhammad';
+  if (get('inputDob')) get('inputDob').value = '1992-05-12';
+  if (get('inputPlaceOfBirth')) get('inputPlaceOfBirth').value = 'Islamabad';
+  if (get('inputCountryOfBirth')) get('inputCountryOfBirth').value = 'Pakistan';
+  if (get('inputNationality')) get('inputNationality').value = 'Pakistan';
+  if (get('inputNationalityAtBirth')) get('inputNationalityAtBirth').value = 'Pakistan';
+  if (get('selectGender')) get('selectGender').value = 'Male';
+  if (get('selectCivilStatus')) get('selectCivilStatus').value = 'Single';
+
+  if (get('inputLegalGuardian')) get('inputLegalGuardian').value = 'N/A';
+
+  if (get('inputCnicNumber')) get('inputCnicNumber').value = '61101-1234567-1';
+  if (get('selectTravelDocumentType')) get('selectTravelDocumentType').value = 'Ordinary Passport';
+  if (get('inputPassportNumber')) get('inputPassportNumber').value = 'PK9842104';
+  if (get('inputPassportIssue')) get('inputPassportIssue').value = '2021-08-15';
+  if (get('inputPassportExpiry')) get('inputPassportExpiry').value = '2031-08-15';
+  if (get('inputPassportPlace')) get('inputPassportPlace').value = 'Islamabad, Pakistan';
+
+  if (get('inputEuFamilyMember')) get('inputEuFamilyMember').value = 'N/A';
+
+  if (get('inputHomeAddress')) get('inputHomeAddress').value = 'House 123, Street 45, Sector F-8/2, Islamabad';
+  if (get('selectResidenceOtherCountry')) get('selectResidenceOtherCountry').value = 'No';
+
+  if (get('inputOccupation')) get('inputOccupation').value = 'Software Engineer / Business Manager';
+  if (get('inputEmployerInfo')) get('inputEmployerInfo').value = 'Tech Solutions Ltd, Blue Area Islamabad, Tel: +92511234567';
+
+  if (get('selectVac')) get('selectVac').value = 'Islamabad VAC';
+  if (get('selectCategory')) get('selectCategory').value = 'Schengen Visa (Short Stay Type C)';
+  if (get('selectSubCategory')) get('selectSubCategory').value = 'Tourism & Private Family Visit (Schengen C)';
+  if (get('inputMainDestination')) get('inputMainDestination').value = 'Greece';
+  if (get('inputFirstEntry')) get('inputFirstEntry').value = 'Greece';
+  if (get('selectEntriesRequested')) get('selectEntriesRequested').value = 'Single Entry';
+  if (get('inputIntendedArrival')) get('inputIntendedArrival').value = '2026-10-15';
+  if (get('inputIntendedDeparture')) get('inputIntendedDeparture').value = '2026-10-30';
+
+  if (get('selectFingerprintsCollected')) get('selectFingerprintsCollected').value = 'No';
+  if (get('selectEntryPermitFinal')) get('selectEntryPermitFinal').value = 'N/A';
+
+  if (get('inputHostInfo')) get('inputHostInfo').value = 'Hotel Royal Olympic, Athanasiou Diakou 28, Athens, Greece, Tel: +302109288400';
+
+  if (get('inputHotelName')) get('inputHotelName').value = 'Royal Olympic Hotel Athens';
+  if (get('inputHotelStreet')) get('inputHotelStreet').value = '28 Athanasiou Diakou Street';
+  if (get('inputHotelCity')) get('inputHotelCity').value = 'Athens';
+  if (get('inputHotelPostal')) get('inputHotelPostal').value = '11743';
+  if (get('inputHotelEmail')) get('inputHotelEmail').value = 'info@royalolympic.gr';
+  if (get('selectHotelCountryPrefix')) get('selectHotelCountryPrefix').value = 'GREECE +30';
+  if (get('inputHotelPhone')) get('inputHotelPhone').value = '2109288400';
+
+  if (get('selectTravelCostCoveredBy')) get('selectTravelCostCoveredBy').value = 'Applicant himself';
+
+  if (get('selectPersonFilling')) get('selectPersonFilling').value = 'Applicant Himself';
+  if (get('selectInsuranceDeclaration')) get('selectInsuranceDeclaration').value = 'Yes - 100% Compliant Schengen Insurance (Min 30,000 EUR Coverage)';
+  if (get('checkAccuracyConfirmation')) get('checkAccuracyConfirmation').checked = true;
+
+  alert('✨ All 33 compulsory fields pre-filled with 100% compliant sample data!');
+}
+
 function openApplicantModal() {
   document.getElementById('applicantModal').classList.remove('hidden');
 }
@@ -705,23 +788,90 @@ function closeApplicantModal() {
 
 async function saveApplicant(e) {
   e.preventDefault();
+  const val = (id) => document.getElementById(id)?.value || '';
+  const chk = (id) => document.getElementById(id)?.checked || false;
+
+  const fullFormData = {
+    username: val('inputUsername') || 'Account01',
+    password: val('inputPassword') || 'Swift@001',
+    phone: val('inputPhone') || '+923001234567',
+    email: val('inputEmail') || 'account01@gvcworld-portal.com',
+
+    surname: val('inputSurname'),
+    surnameAtBirth: val('inputSurnameAtBirth'),
+    givenName: val('inputGivenName'),
+    dob: val('inputDob'),
+    placeOfBirth: val('inputPlaceOfBirth'),
+    countryOfBirth: val('inputCountryOfBirth'),
+    nationality: val('inputNationality'),
+    nationalityAtBirth: val('inputNationalityAtBirth'),
+    gender: val('selectGender'),
+    civilStatus: val('selectCivilStatus'),
+
+    legalGuardian: val('inputLegalGuardian'),
+
+    cnicNumber: val('inputCnicNumber'),
+    travelDocumentType: val('selectTravelDocumentType'),
+    passportNumber: val('inputPassportNumber'),
+    passportIssue: val('inputPassportIssue'),
+    passportExpiry: val('inputPassportExpiry'),
+    passportPlace: val('inputPassportPlace'),
+
+    euFamilyMember: val('inputEuFamilyMember'),
+
+    homeAddress: val('inputHomeAddress'),
+    residenceOtherCountry: val('selectResidenceOtherCountry'),
+
+    occupation: val('inputOccupation'),
+    employerInfo: val('inputEmployerInfo'),
+
+    vac: val('selectVac'),
+    category: val('selectCategory'),
+    subCategory: val('selectSubCategory'),
+    mainDestination: val('inputMainDestination'),
+    firstEntry: val('inputFirstEntry'),
+    entriesRequested: val('selectEntriesRequested'),
+    intendedArrival: val('inputIntendedArrival'),
+    intendedDeparture: val('inputIntendedDeparture'),
+
+    fingerprintsCollected: val('selectFingerprintsCollected'),
+    entryPermitFinal: val('selectEntryPermitFinal'),
+
+    hostInfo: val('inputHostInfo'),
+
+    hotelName: val('inputHotelName'),
+    hotelStreet: val('inputHotelStreet'),
+    hotelCity: val('inputHotelCity'),
+    hotelPostal: val('inputHotelPostal'),
+    hotelEmail: val('inputHotelEmail'),
+    hotelCountryPrefix: val('selectHotelCountryPrefix'),
+    hotelPhone: val('inputHotelPhone'),
+
+    travelCostCoveredBy: val('selectTravelCostCoveredBy'),
+
+    personFilling: val('selectPersonFilling'),
+    insuranceDeclaration: val('selectInsuranceDeclaration'),
+    accuracyConfirmation: chk('checkAccuracyConfirmation')
+  };
+
   const payload = {
-    username: document.getElementById('inputUsername')?.value || 'Account01',
-    password: document.getElementById('inputPassword')?.value || 'Swift@001',
-    givenName: document.getElementById('inputGivenName').value,
-    surname: document.getElementById('inputSurname').value,
-    dob: document.getElementById('inputDob')?.value || '1992-05-12',
-    gender: document.getElementById('selectGender')?.value || 'Male',
-    nationality: document.getElementById('inputNationality')?.value || 'Pakistan',
-    passportNumber: document.getElementById('inputPassportNumber').value,
-    passportIssue: document.getElementById('inputPassportIssue')?.value || '2020-01-01',
-    passportExpiry: document.getElementById('inputPassportExpiry').value,
-    passportPlace: document.getElementById('inputPassportPlace')?.value || 'Islamabad',
-    vac: document.getElementById('selectVac').value,
-    category: document.getElementById('selectCategory').value,
-    subCategory: document.getElementById('selectSubCategory')?.value || 'Tourism & Private Visit',
-    phone: document.getElementById('inputPhone').value,
-    email: document.getElementById('inputEmail').value
+    username: fullFormData.username,
+    password: fullFormData.password,
+    givenName: fullFormData.givenName,
+    surname: fullFormData.surname,
+    dob: fullFormData.dob,
+    gender: fullFormData.gender,
+    nationality: fullFormData.nationality,
+    passportNumber: fullFormData.passportNumber,
+    passportIssue: fullFormData.passportIssue,
+    passportExpiry: fullFormData.passportExpiry,
+    passportPlace: fullFormData.passportPlace,
+    vac: fullFormData.vac,
+    category: fullFormData.category,
+    subCategory: fullFormData.subCategory,
+    phone: fullFormData.phone,
+    email: fullFormData.email,
+    fullFormData
   };
 
   try {
@@ -732,10 +882,14 @@ async function saveApplicant(e) {
     });
     if (res.ok) {
       closeApplicantModal();
-      document.getElementById('formApplicant').reset();
       refreshAll();
+    } else {
+      const err = await res.json();
+      alert('Error saving applicant profile: ' + (err.error || 'Failed to save'));
     }
-  } catch(err) {}
+  } catch(err) {
+    alert('Failed to save applicant: ' + err.message);
+  }
 }
 
 async function deleteApplicant(id) {
