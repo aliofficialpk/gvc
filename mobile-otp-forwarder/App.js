@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   StyleSheet,
   Text,
@@ -6,24 +6,23 @@ import {
   TextInput,
   TouchableOpacity,
   ScrollView,
-  PermissionsAndroid,
-  Platform,
   Alert,
   SafeAreaView,
-  StatusBar
+  StatusBar,
+  Platform
 } from 'react-native';
 
 export default function App() {
   const [serverUrl, setServerUrl] = useState('https://gvcworld-portal.vercel.app');
-  const [isRelayActive, setIsRelayActive] = useState(false);
-  const [hasPermission, setHasPermission] = useState(false);
-  const [logs, setLogs] = useState([]);
-  const [testOtpInput, setTestOtpInput] = useState('');
-
-  useEffect(() => {
-    addLog('SYSTEM', 'GVC SMS OTP Forwarder initialized.');
-    checkSmsPermission();
-  }, []);
+  const [otpCodeInput, setOtpCodeInput] = useState('');
+  const [logs, setLogs] = useState([
+    {
+      id: '1',
+      time: new Date().toLocaleTimeString(),
+      type: 'SYSTEM',
+      message: 'GVC Manual OTP Assistant initialized.'
+    }
+  ]);
 
   const addLog = (type, message) => {
     const time = new Date().toLocaleTimeString();
@@ -33,91 +32,33 @@ export default function App() {
     ]);
   };
 
-  const checkSmsPermission = async () => {
-    if (Platform.OS !== 'android') {
-      addLog('WARNING', 'SMS Auto-Detection requires Android operating system.');
+  const submitOtpToServer = async () => {
+    if (!otpCodeInput || otpCodeInput.trim().length < 4) {
+      Alert.alert('Invalid Input', 'Please enter a valid verification code (4-8 digits).');
       return;
     }
 
-    try {
-      const grantedRead = await PermissionsAndroid.check(
-        PermissionsAndroid.PERMISSIONS.READ_SMS
-      );
-      const grantedReceive = await PermissionsAndroid.check(
-        PermissionsAndroid.PERMISSIONS.RECEIVE_SMS
-      );
-
-      if (grantedRead && grantedReceive) {
-        setHasPermission(true);
-        addLog('PERMISSION', 'Android SMS Read & Receive permissions granted.');
-      }
-    } catch (err) {
-      addLog('ERROR', 'Permission check error: ' + err.message);
-    }
-  };
-
-  const requestSmsPermission = async () => {
-    if (Platform.OS !== 'android') {
-      Alert.alert('Notice', 'SMS auto-reading is supported on Android devices.');
-      return;
-    }
-
-    try {
-      const granted = await PermissionsAndroid.requestMultiple([
-        PermissionsAndroid.PERMISSIONS.READ_SMS,
-        PermissionsAndroid.PERMISSIONS.RECEIVE_SMS,
-      ]);
-
-      if (
-        granted['android.permission.READ_SMS'] === PermissionsAndroid.RESULTS.GRANTED &&
-        granted['android.permission.RECEIVE_SMS'] === PermissionsAndroid.RESULTS.GRANTED
-      ) {
-        setHasPermission(true);
-        setIsRelayActive(true);
-        addLog('PERMISSION', '✅ SMS Permissions Granted! Relay is now ACTIVE.');
-        Alert.alert('Success', 'SMS Permissions granted. Auto-relay is active!');
-      } else {
-        setHasPermission(false);
-        addLog('PERMISSION', '❌ SMS Permissions Denied by user.');
-        Alert.alert('Permission Required', 'SMS permission is required to auto-detect GVC OTP codes.');
-      }
-    } catch (err) {
-      addLog('ERROR', 'Failed to request permissions: ' + err.message);
-    }
-  };
-
-  const toggleRelay = () => {
-    if (!hasPermission) {
-      requestSmsPermission();
-      return;
-    }
-    const nextState = !isRelayActive;
-    setIsRelayActive(nextState);
-    addLog('STATUS', nextState ? '▶️ SMS Relay Activated.' : '⏸️ SMS Relay Paused.');
-  };
-
-  const forwardOtpToServer = async (otpCode, rawSmsText = '') => {
     if (!serverUrl || !serverUrl.trim()) {
-      addLog('ERROR', 'Server URL is missing! Please configure Server API URL.');
+      Alert.alert('Missing URL', 'Please enter your backend API URL.');
       return;
     }
 
+    const cleanCode = otpCodeInput.trim();
     const cleanBaseUrl = serverUrl.trim().replace(/\/+$/, '');
     const endpointUrl = `${cleanBaseUrl}/api/applications/submit-otp`;
 
-    addLog('FORWARDING', `🚀 Transmitting OTP (${otpCode}) to server endpoint: ${endpointUrl}`);
+    addLog('SUBMITTING', `Sending OTP (${cleanCode}) to backend: ${endpointUrl}`);
 
     try {
       const response = await fetch(endpointUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'User-Agent': 'GVCOtpForwarderAndroid/1.0'
+          'User-Agent': 'GVCOtpAssistantAndroid/1.0'
         },
         body: JSON.stringify({
-          otpCode: otpCode,
-          source: 'ANDROID_SMS_AUTO_RELAY',
-          rawMessageSnippet: rawSmsText.substring(0, 100),
+          otpCode: cleanCode,
+          source: 'MANUAL_USER_ENTRY',
           timestamp: new Date().toISOString()
         })
       });
@@ -125,25 +66,18 @@ export default function App() {
       const data = await response.json();
 
       if (response.ok && data.success) {
-        addLog('SUCCESS', `🎉 OTP (${otpCode}) injected into GVC Portal session successfully!`);
-        Alert.alert('OTP Relayed', `OTP Code (${otpCode}) forwarded and injected cleanly into GVC agent!`);
+        addLog('SUCCESS', `✅ OTP (${cleanCode}) submitted successfully!`);
+        Alert.alert('Success', `Verification code (${cleanCode}) submitted cleanly to backend agent.`);
+        setOtpCodeInput('');
       } else {
-        addLog('SERVER_ERROR', `Server rejected OTP: ${data.error || 'Unknown error'}`);
+        addLog('SERVER_ERROR', `Server response: ${data.error || 'Request processed with notice'}`);
+        Alert.alert('Notice', data.error || 'OTP received by backend.');
+        setOtpCodeInput('');
       }
     } catch (err) {
-      addLog('NETWORK_ERROR', `Network failure forwarding OTP: ${err.message}`);
+      addLog('NETWORK_ERROR', `Network error: ${err.message}`);
+      Alert.alert('Network Error', `Could not reach backend server at ${endpointUrl}`);
     }
-  };
-
-  const handleManualTestRelay = () => {
-    if (!testOtpInput || testOtpInput.trim().length < 4) {
-      Alert.alert('Invalid OTP', 'Please enter a valid 4-6 digit OTP code.');
-      return;
-    }
-    const code = testOtpInput.trim();
-    addLog('TEST', `Manual test trigger initiated for OTP: ${code}`);
-    forwardOtpToServer(code, 'Manual Test Verification Message');
-    setTestOtpInput('');
   };
 
   return (
@@ -152,89 +86,57 @@ export default function App() {
 
       {/* Header Banner */}
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>GVC World Visa Assistant</Text>
-        <Text style={styles.headerSubtitle}>Android SMS OTP Auto-Forwarder & Relay App</Text>
+        <Text style={styles.headerTitle}>GVC Verification Assistant</Text>
+        <Text style={styles.headerSubtitle}>Manual OTP Entry & Status Monitor</Text>
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
 
-        {/* Server Configuration Box */}
+        {/* Server Configuration */}
         <View style={styles.card}>
-          <Text style={styles.cardTitle}>🌐 GVC Server Connection</Text>
-          <Text style={styles.label}>Backend Agent API URL:</Text>
+          <Text style={styles.cardTitle}>🌐 Backend Connection</Text>
+          <Text style={styles.label}>Server API Endpoint:</Text>
           <TextInput
             style={styles.input}
             value={serverUrl}
             onChangeText={setServerUrl}
-            placeholder="http://192.168.1.10:3000 or https://your-app.vercel.app"
+            placeholder="https://your-backend-domain.com"
             autoCapitalize="none"
             autoCorrect={false}
           />
         </View>
 
-        {/* SMS Relay Status Card */}
-        <View style={[styles.card, isRelayActive ? styles.cardActive : styles.cardInactive]}>
-          <View style={styles.statusRow}>
-            <View>
-              <Text style={styles.cardTitle}>📱 SMS Listener Status</Text>
-              <Text style={styles.statusText}>
-                {isRelayActive ? '🟢 ACTIVE & WATCHING SMS' : '🔴 PAUSED / INACTIVE'}
-              </Text>
-            </View>
-            <TouchableOpacity
-              style={[styles.btnToggle, isRelayActive ? styles.btnPause : styles.btnStart]}
-              onPress={toggleRelay}
-            >
-              <Text style={styles.btnToggleText}>
-                {isRelayActive ? 'Pause' : 'Start'}
-              </Text>
-            </TouchableOpacity>
-          </View>
-
-          <Text style={styles.permissionInfo}>
-            {hasPermission
-              ? '✅ Android SMS Read/Receive Permission Authorized.'
-              : '⚠️ SMS Permission required to detect GVC OTP messages automatically.'}
-          </Text>
-
-          {!hasPermission && (
-            <TouchableOpacity style={styles.btnGrant} onPress={requestSmsPermission}>
-              <Text style={styles.btnGrantText}>Grant Android SMS Permission</Text>
-            </TouchableOpacity>
-          )}
-        </View>
-
-        {/* Manual Test Relay Card */}
+        {/* Manual OTP Entry Card */}
         <View style={styles.card}>
-          <Text style={styles.cardTitle}>⚡ Test OTP Forwarding</Text>
-          <Text style={styles.label}>Enter Test 6-Digit OTP Code:</Text>
-          <View style={styles.testRow}>
+          <Text style={styles.cardTitle}>🔑 Verification Code Entry</Text>
+          <Text style={styles.label}>Enter Code Received on Mobile:</Text>
+          <View style={styles.inputRow}>
             <TextInput
-              style={[styles.input, { flex: 1, marginBottom: 0 }]}
-              value={testOtpInput}
-              onChangeText={setTestOtpInput}
+              style={[styles.input, { flex: 1, marginBottom: 0, fontSize: 18, fontWeight: 'bold', letterSpacing: 2 }]}
+              value={otpCodeInput}
+              onChangeText={setOtpCodeInput}
               placeholder="e.g. 583920"
               keyboardType="number-pad"
               maxLength={8}
             />
-            <TouchableOpacity style={styles.btnTest} onPress={handleManualTestRelay}>
-              <Text style={styles.btnTestText}>Forward</Text>
+            <TouchableOpacity style={styles.btnSubmit} onPress={submitOtpToServer}>
+              <Text style={styles.btnSubmitText}>Submit OTP</Text>
             </TouchableOpacity>
           </View>
         </View>
 
-        {/* Live Logs Console */}
+        {/* Activity Logs */}
         <View style={styles.card}>
-          <View style={styles.statusRow}>
-            <Text style={styles.cardTitle}>📜 Live Relay Log Console</Text>
+          <View style={styles.headerRow}>
+            <Text style={styles.cardTitle}>📜 Submission Log</Text>
             <TouchableOpacity onPress={() => setLogs([])}>
-              <Text style={styles.clearText}>Clear Logs</Text>
+              <Text style={styles.clearText}>Clear</Text>
             </TouchableOpacity>
           </View>
 
           <View style={styles.consoleBox}>
             {logs.length === 0 ? (
-              <Text style={styles.emptyLogText}>No events recorded yet.</Text>
+              <Text style={styles.emptyLogText}>No submission events recorded.</Text>
             ) : (
               logs.map((item) => (
                 <View key={item.id} style={styles.logItem}>
@@ -289,34 +191,17 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 2,
   },
-  cardActive: {
-    borderColor: '#10B981',
-    backgroundColor: '#ECFDF5',
-  },
-  cardInactive: {
-    borderColor: '#E5E7EB',
-  },
   cardTitle: {
     fontSize: 14,
     fontWeight: 'bold',
     color: '#111827',
     marginBottom: 8,
   },
-  statusRow: {
+  headerRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-  },
-  statusText: {
-    fontSize: 12,
-    fontWeight: 'bold',
-    color: '#047857',
-    marginTop: 2,
-  },
-  permissionInfo: {
-    fontSize: 11,
-    color: '#4B5563',
-    marginTop: 10,
+    marginBottom: 8,
   },
   label: {
     fontSize: 12,
@@ -335,68 +220,40 @@ const styles = StyleSheet.create({
     color: '#111827',
     marginBottom: 8,
   },
-  btnToggle: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 8,
-  },
-  btnStart: {
-    backgroundColor: '#059669',
-  },
-  btnPause: {
-    backgroundColor: '#DC2626',
-  },
-  btnToggleText: {
-    color: '#FFFFFF',
-    fontWeight: 'bold',
-    fontSize: 13,
-  },
-  btnGrant: {
-    backgroundColor: '#4F46E5',
-    padding: 12,
-    borderRadius: 8,
-    marginTop: 12,
-    alignItems: 'center',
-  },
-  btnGrantText: {
-    color: '#FFFFFF',
-    fontWeight: 'bold',
-    fontSize: 13,
-  },
-  testRow: {
+  inputRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
   },
-  btnTest: {
+  btnSubmit: {
     backgroundColor: '#059669',
-    paddingHorizontal: 16,
+    paddingHorizontal: 18,
     paddingVertical: 12,
     borderRadius: 8,
   },
-  btnTestText: {
+  btnSubmitText: {
     color: '#FFFFFF',
     fontWeight: 'bold',
     fontSize: 13,
   },
   clearText: {
     fontSize: 11,
-    color: '#4F46E5',
+    color: '#059669',
     fontWeight: 'bold',
   },
   consoleBox: {
     backgroundColor: '#1F2937',
     borderRadius: 8,
     padding: 12,
-    minHeight: 180,
-    maxHeight: 280,
+    minHeight: 160,
+    maxHeight: 260,
   },
   emptyLogText: {
     color: '#9CA3AF',
     fontSize: 12,
     fontStyle: 'italic',
     textAlign: 'center',
-    marginTop: 60,
+    marginTop: 50,
   },
   logItem: {
     marginBottom: 6,
