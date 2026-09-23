@@ -308,21 +308,21 @@
 
   </main>
 
-  <!-- Add Applicant Modal (Complete Field Support) -->
+  <!-- Add Applicant Modal (Streamlined Appointment Fields) -->
   <div id="applicantModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center p-3">
-    <div class="bg-white border border-gray-200 rounded-xl max-w-4xl w-full p-6 space-y-4 shadow-2xl relative max-h-[92vh] flex flex-col">
+    <div class="bg-white border border-gray-200 rounded-xl max-w-3xl w-full p-6 space-y-4 shadow-2xl relative max-h-[92vh] flex flex-col">
       <div class="flex items-center justify-between pb-3 border-b border-gray-200 shrink-0">
         <div>
           <h3 class="text-base font-bold text-gray-900 flex items-center gap-2">
             <i data-lucide="user-plus" class="w-5 h-5 text-emerald-600"></i>
-            Create / Edit Full Applicant Profile (33 Compulsory GVC Form Fields)
+            Create / Edit Applicant Profile
           </h3>
-          <p class="text-xs text-gray-500">Matches all 13 official portal sections (pk-gr-services.gvcworld.eu)</p>
+          <p class="text-xs text-gray-500">Core appointment booking fields for GVC World Greece Pakistan</p>
         </div>
         <div class="flex items-center space-x-2">
           <button type="button" onclick="prefillFullSampleData()" class="px-3 py-1.5 rounded bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs border border-indigo-200 transition flex items-center gap-1">
             <i data-lucide="wand-2" class="w-3.5 h-3.5"></i>
-            ✨ Quick Auto-Fill All 33 Fields
+            ✨ Quick Auto-Fill Sample Data
           </button>
           <button type="button" onclick="closeApplicantModal()" class="text-gray-400 hover:text-gray-600 p-1"><i data-lucide="x" class="w-5 h-5"></i></button>
         </div>
@@ -330,22 +330,7 @@
 
       <form id="formApplicant" onsubmit="saveApplicant(event)" class="flex flex-col flex-1 overflow-hidden space-y-4">
         
-        <!-- Modal Section Tabs Navigation -->
-        <div class="flex space-x-1 border-b border-gray-200 pb-2 overflow-x-auto shrink-0 text-xs font-semibold scrollbar-none" id="modalSectionTabs">
-          <button type="button" onclick="switchModalSection('secCredentials')" class="modal-tab active px-3 py-1.5 rounded-md bg-emerald-600 text-white shadow-sm shrink-0">Credentials</button>
-          <button type="button" onclick="switchModalSection('secPersonal')" class="modal-tab px-3 py-1.5 rounded-md bg-gray-100 text-gray-700 hover:bg-gray-200 shrink-0">1. Personal (1-9)</button>
-          <button type="button" onclick="switchModalSection('secGuardian')" class="modal-tab px-3 py-1.5 rounded-md bg-gray-100 text-gray-700 hover:bg-gray-200 shrink-0">2. Guardian (10)</button>
-          <button type="button" onclick="switchModalSection('secId')" class="modal-tab px-3 py-1.5 rounded-md bg-gray-100 text-gray-700 hover:bg-gray-200 shrink-0">3. ID & Travel Docs (11-16)</button>
-          <button type="button" onclick="switchModalSection('secEu')" class="modal-tab px-3 py-1.5 rounded-md bg-gray-100 text-gray-700 hover:bg-gray-200 shrink-0">4. EU Family (17,18)</button>
-          <button type="button" onclick="switchModalSection('secResidence')" class="modal-tab px-3 py-1.5 rounded-md bg-gray-100 text-gray-700 hover:bg-gray-200 shrink-0">5. Residence (19,20)</button>
-          <button type="button" onclick="switchModalSection('secOccupation')" class="modal-tab px-3 py-1.5 rounded-md bg-gray-100 text-gray-700 hover:bg-gray-200 shrink-0">6. Occupation (21,22)</button>
-          <button type="button" onclick="switchModalSection('secTravel')" class="modal-tab px-3 py-1.5 rounded-md bg-gray-100 text-gray-700 hover:bg-gray-200 shrink-0">7. Travel Info (23-27)</button>
-          <button type="button" onclick="switchModalSection('secVisas')" class="modal-tab px-3 py-1.5 rounded-md bg-gray-100 text-gray-700 hover:bg-gray-200 shrink-0">8. Visas & Permits (28,29)</button>
-          <button type="button" onclick="switchModalSection('secHosting')" class="modal-tab px-3 py-1.5 rounded-md bg-gray-100 text-gray-700 hover:bg-gray-200 shrink-0">9. Hosting (30,31)</button>
-          <button type="button" onclick="switchModalSection('secAccommodation')" class="modal-tab px-3 py-1.5 rounded-md bg-gray-100 text-gray-700 hover:bg-gray-200 shrink-0">10. Accommodation (30.2)</button>
-          <button type="button" onclick="switchModalSection('secCost')" class="modal-tab px-3 py-1.5 rounded-md bg-gray-100 text-gray-700 hover:bg-gray-200 shrink-0">11. Cost (32)</button>
-          <button type="button" onclick="switchModalSection('secInsurance')" class="modal-tab px-3 py-1.5 rounded-md bg-gray-100 text-gray-700 hover:bg-gray-200 shrink-0">12,13. Insurance & Check (33)</button>
-        </div>
+
 
         <!-- Section Content Panels Container -->
         <div class="flex-1 overflow-y-auto pr-1 space-y-4 text-xs">
