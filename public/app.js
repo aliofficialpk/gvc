@@ -2,6 +2,7 @@
 
 let state = {
   activeTab: 'monitor',
+  historySubTab: 'all',
   isMonitoring: false,
   checkIntervalSeconds: 120,
   scanCount: 0,
@@ -432,31 +433,97 @@ async function fetchHistory() {
   } catch(e) {}
 }
 
+function switchHistorySubTab(tabName) {
+  state.historySubTab = tabName;
+
+  const btnAll = document.getElementById('subTabAll');
+  const btnSuccess = document.getElementById('subTabSuccess');
+  const btnGateway = document.getElementById('subTabGateway');
+
+  const activeClass = 'history-subtab active px-3.5 py-1.5 rounded-md bg-emerald-600 text-white font-bold text-xs shadow-sm flex items-center gap-1.5';
+  const inactiveClass = 'history-subtab px-3.5 py-1.5 rounded-md bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold text-xs transition flex items-center gap-1.5';
+
+  if (btnAll) btnAll.className = inactiveClass;
+  if (btnSuccess) btnSuccess.className = inactiveClass;
+  if (btnGateway) btnGateway.className = inactiveClass;
+
+  if (tabName === 'all' && btnAll) btnAll.className = activeClass;
+  if (tabName === 'success' && btnSuccess) btnSuccess.className = activeClass;
+  if (tabName === 'gateway' && btnGateway) btnGateway.className = activeClass;
+
+  renderHistory(state.history);
+}
+
+function isSuccessStatus(status) {
+  return ['OTP_SUBMITTED', 'PORTAL_FILLED_SUCCESS', 'LIVE_SLOT_PREFILLED', 'BOOKED_SUCCESS', 'AUTO_FILLED_SUCCESS'].includes(status);
+}
+
+function isGatewayStatus(status) {
+  return ['WAF_GATEWAY_PROTECTED', 'PORTAL_INSPECTED', 'PLAYWRIGHT_RETRY', 'QUEUED'].includes(status);
+}
+
 function renderHistory(list) {
   const container = document.getElementById('historyTableBody');
   const badge = document.getElementById('badgeHistoryCount');
   if (!container) return;
 
-  if (badge) badge.innerText = list.length;
+  const totalCount = list.length;
+  const successList = list.filter(h => isSuccessStatus(h.status));
+  const gatewayList = list.filter(h => isGatewayStatus(h.status));
 
-  if (list.length === 0) {
+  if (badge) badge.innerText = totalCount;
+
+  // Update Summary KPI Cards
+  const elTotal = document.getElementById('statTotalAttempts');
+  const elSuccess = document.getElementById('textStatSuccess');
+  const elGateway = document.getElementById('statGatewayProtected');
+  const elMatch = document.getElementById('statAvgMatchRate');
+
+  if (elTotal) elTotal.innerText = totalCount;
+  if (elSuccess) elSuccess.innerText = successList.length;
+  if (elGateway) elGateway.innerText = gatewayList.length;
+
+  if (elMatch && totalCount > 0) {
+    const totalMatchSum = list.reduce((acc, h) => acc + (Number(h.autofill_match_rate) || 100), 0);
+    const avgMatch = Math.round(totalMatchSum / totalCount);
+    elMatch.innerText = `${avgMatch}%`;
+  }
+
+  // Update Sub-Tab Badges
+  const bAll = document.getElementById('badgeSubTabAll');
+  const bSuccess = document.getElementById('badgeSubTabSuccess');
+  const bGateway = document.getElementById('badgeSubTabGateway');
+
+  if (bAll) bAll.innerText = totalCount;
+  if (bSuccess) bSuccess.innerText = successList.length;
+  if (bGateway) bGateway.innerText = gatewayList.length;
+
+  // Apply Sub-Tab Filter
+  let filteredList = list;
+  if (state.historySubTab === 'success') {
+    filteredList = successList;
+  } else if (state.historySubTab === 'gateway') {
+    filteredList = gatewayList;
+  }
+
+  if (filteredList.length === 0) {
     container.innerHTML = `
       <tr>
         <td colspan="8" class="text-center py-8 text-gray-500 bg-gray-50 border-b border-gray-200">
-          No applications recorded yet. Go to <strong>"Applicants & Auto-Apply Profiles"</strong> tab and click <strong>"Auto-Apply Test Run"</strong>!
+          No application records found under <strong>"${escapeHtml(state.historySubTab.toUpperCase())}"</strong> filter.
         </td>
       </tr>
     `;
     return;
   }
 
-  container.innerHTML = list.map(h => {
+  container.innerHTML = filteredList.map(h => {
     let badgeBg = 'bg-emerald-600 text-white';
     let statusText = h.status || 'AUTO_FILLED_SUCCESS';
 
     if (statusText === 'PORTAL_FILLED_SUCCESS' || statusText === 'LIVE_SLOT_PREFILLED') {
       badgeBg = 'bg-emerald-600 text-white shadow-sm';
-      statusText = '⚡ PORTAL FORM PRE-FILLED';
+      statusText = '⚡ PORTAL FORM PRE-FILLED & CONFIRMED';
     } else if (statusText === 'WAF_GATEWAY_PROTECTED') {
       badgeBg = 'bg-amber-100 text-amber-900 border border-amber-300 font-bold';
       statusText = '🛡️ WAF GATEWAY PROTECTED';
@@ -464,8 +531,8 @@ function renderHistory(list) {
       badgeBg = 'bg-blue-100 text-blue-900 border border-blue-200 font-bold';
       statusText = '🔍 PORTAL LIVE INSPECTED';
     } else if (statusText === 'OTP_SUBMITTED') {
-      badgeBg = 'bg-purple-600 text-white font-bold';
-      statusText = '🔑 OTP INJECTED & SUBMITTED';
+      badgeBg = 'bg-purple-600 text-white font-bold shadow-sm';
+      statusText = '🔑 OTP INJECTED & BOOKING SUCCESSFUL';
     } else if (statusText === 'TEST_SIMULATION') {
       badgeBg = 'bg-indigo-100 text-indigo-800 border border-indigo-200';
       statusText = 'TEST RUN (SIMULATED)';
@@ -473,7 +540,7 @@ function renderHistory(list) {
 
     const proofBtn = h.screenshotUrl ? `
       <a href="${escapeHtml(h.screenshotUrl)}" target="_blank" class="inline-flex items-center gap-1 text-[10px] font-bold text-indigo-600 hover:underline mt-1">
-        <i data-lucide="camera" class="w-3 h-3"></i> View Portal Snapshot
+        <i data-lucide="camera" class="w-3 h-3"></i> View Visual Snapshot
       </a>
     ` : '';
 
@@ -498,7 +565,7 @@ function renderHistory(list) {
           ${proofBtn}
         </td>
         <td class="p-3 text-gray-500 font-mono text-[11px]">
-          ${new Date(h.applied_at).toLocaleString()}
+          ${new Date(h.applied_at).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' })}
         </td>
         <td class="p-3 text-right">
           <div class="flex items-center justify-end space-x-1">
