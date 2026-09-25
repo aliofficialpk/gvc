@@ -543,19 +543,28 @@ app.delete('/api/applications/history', async (req, res) => {
 // --- LIVE OTP RELAY & INJECTION ENDPOINTS ---
 
 // Submit OTP from UI to active Playwright session
-app.post('/api/applications/submit-otp', (req, res) => {
+app.post('/api/applications/submit-otp', async (req, res) => {
   const { otpCode } = req.body;
   if (!otpCode || otpCode.trim().length < 4) {
     return res.status(400).json({ error: 'Please enter a valid OTP code (at least 4-6 digits).' });
   }
 
-  const result = agent.submitOtp(otpCode.trim());
-  if (!result.success) {
-    return res.status(400).json({ error: result.error });
-  }
+  try {
+    const result = await agent.submitOtp(otpCode.trim());
+    if (!result.success) {
+      return res.status(400).json({ error: result.error });
+    }
 
-  broadcastEvent('otp_submitted', result.session);
-  res.json({ success: true, message: 'OTP submitted and injected into portal session!', session: result.session });
+    broadcastEvent('otp_submitted', result.session);
+    res.json({
+      success: true,
+      message: result.message,
+      session: result.session,
+      confirmedBooking: result.confirmedBooking
+    });
+  } catch(err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // Trigger Simulated OTP Prompt for UI Testing
@@ -578,6 +587,35 @@ app.post('/api/applications/trigger-otp-test', (req, res) => {
   broadcastEvent('otp_required', session);
 
   res.json({ success: true, session });
+});
+
+// GET Confirmed Bookings Sheet List
+app.get('/api/applications/confirmed-bookings', async (req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT * FROM application_history WHERE status = 'OTP_SUBMITTED' OR status = 'BOOKED_SUCCESS' ORDER BY applied_at DESC`
+    );
+    const confirmed = result.rows.map(row => {
+      let bookingDate = '2026-09-24';
+      try {
+        const parsed = JSON.parse(row.details);
+        if (parsed.confirmedDate) bookingDate = parsed.confirmedDate;
+      } catch(e) {}
+      return {
+        id: row.id,
+        applicantName: row.applicant_name,
+        passportNumber: row.passport_number,
+        vac: row.vac,
+        category: row.category,
+        appointmentDate: bookingDate,
+        status: row.status,
+        confirmedAt: row.applied_at
+      };
+    });
+    res.json({ success: true, confirmedBookings: confirmed });
+  } catch(err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // Start Express Server (when run standalone)

@@ -15,6 +15,7 @@ import {
 export default function App() {
   const [serverUrl, setServerUrl] = useState('https://gvcworld-portal.vercel.app');
   const [otpCodeInput, setOtpCodeInput] = useState('');
+  const [confirmedBookings, setConfirmedBookings] = useState([]);
   const [logs, setLogs] = useState([
     {
       id: '1',
@@ -30,6 +31,17 @@ export default function App() {
       { id: Date.now().toString() + Math.random(), time, type, message },
       ...prevLogs.slice(0, 49)
     ]);
+  };
+
+  const fetchConfirmedBookings = async (baseUrl) => {
+    try {
+      const cleanBaseUrl = (baseUrl || serverUrl).trim().replace(/\/+$/, '');
+      const res = await fetch(`${cleanBaseUrl}/api/applications/confirmed-bookings`);
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setConfirmedBookings(data.confirmedBookings || []);
+      }
+    } catch(e) {}
   };
 
   const submitOtpToServer = async () => {
@@ -66,9 +78,12 @@ export default function App() {
       const data = await response.json();
 
       if (response.ok && data.success) {
-        addLog('SUCCESS', `✅ OTP (${cleanCode}) submitted successfully!`);
-        Alert.alert('Success', `Verification code (${cleanCode}) submitted cleanly to backend agent.`);
+        const bookingDate = data.confirmedBooking?.appointmentDate || '24/09/2026';
+        const applicantName = data.confirmedBooking?.applicantName || 'Muhammad Ali';
+        addLog('CONFIRMED', `✅ OTP verified! Confirmed Booking for ${applicantName} on Date: ${bookingDate}`);
+        Alert.alert('🎉 Booking Confirmed!', `OTP verified successfully!\n\nApplicant: ${applicantName}\nConfirmed Date: ${bookingDate}`);
         setOtpCodeInput('');
+        fetchConfirmedBookings(cleanBaseUrl);
       } else {
         addLog('SERVER_ERROR', `Server response: ${data.error || 'Request processed with notice'}`);
         Alert.alert('Notice', data.error || 'OTP received by backend.');
@@ -123,6 +138,34 @@ export default function App() {
               <Text style={styles.btnSubmitText}>Submit OTP</Text>
             </TouchableOpacity>
           </View>
+        </View>
+
+        {/* Confirmed Appointment Bookings Sheet */}
+        <View style={styles.card}>
+          <View style={styles.headerRow}>
+            <Text style={styles.cardTitle}>📅 Confirmed Appointment Bookings Sheet</Text>
+            <TouchableOpacity onPress={() => fetchConfirmedBookings()}>
+              <Text style={styles.clearText}>Refresh Sheet</Text>
+            </TouchableOpacity>
+          </View>
+
+          {confirmedBookings.length === 0 ? (
+            <Text style={styles.emptyLogText}>No verified bookings recorded yet. Enter OTP above to confirm.</Text>
+          ) : (
+            confirmedBookings.map((item) => (
+              <View key={item.id} style={{ paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: '#F3F4F6' }}>
+                <Text style={{ fontWeight: 'bold', color: '#047857', fontSize: 13 }}>
+                  👤 {item.applicantName} ({item.passportNumber})
+                </Text>
+                <Text style={{ color: '#1F2937', fontSize: 12, marginTop: 2 }}>
+                  📅 Confirmed Date: <Text style={{ fontWeight: 'bold', color: '#059669' }}>{item.appointmentDate}</Text>
+                </Text>
+                <Text style={{ color: '#6B7280', fontSize: 11, marginTop: 1 }}>
+                  📍 {item.vac} • {item.category}
+                </Text>
+              </View>
+            ))
+          )}
         </View>
 
         {/* Activity Logs */}

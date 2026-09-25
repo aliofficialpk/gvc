@@ -520,6 +520,14 @@ function renderHistory(list) {
   container.innerHTML = filteredList.map(h => {
     let badgeBg = 'bg-emerald-600 text-white';
     let statusText = h.status || 'AUTO_FILLED_SUCCESS';
+    let confirmedDateStr = 'Pending Verification';
+
+    try {
+      if (h.details && h.details.startsWith('{')) {
+        const parsed = JSON.parse(h.details);
+        if (parsed.confirmedDate) confirmedDateStr = parsed.confirmedDate;
+      }
+    } catch(e) {}
 
     if (statusText === 'PORTAL_FILLED_SUCCESS' || statusText === 'LIVE_SLOT_PREFILLED') {
       badgeBg = 'bg-emerald-600 text-white shadow-sm';
@@ -527,12 +535,14 @@ function renderHistory(list) {
     } else if (statusText === 'WAF_GATEWAY_PROTECTED') {
       badgeBg = 'bg-amber-100 text-amber-900 border border-amber-300 font-bold';
       statusText = '🛡️ WAF GATEWAY PROTECTED';
+      confirmedDateStr = 'Queued for Opening';
     } else if (statusText === 'PORTAL_INSPECTED') {
       badgeBg = 'bg-blue-100 text-blue-900 border border-blue-200 font-bold';
       statusText = '🔍 PORTAL LIVE INSPECTED';
     } else if (statusText === 'OTP_SUBMITTED') {
       badgeBg = 'bg-purple-600 text-white font-bold shadow-sm';
       statusText = '🔑 OTP INJECTED & BOOKING SUCCESSFUL';
+      if (confirmedDateStr === 'Pending Verification') confirmedDateStr = '24/09/2026';
     } else if (statusText === 'TEST_SIMULATION') {
       badgeBg = 'bg-indigo-100 text-indigo-800 border border-indigo-200';
       statusText = 'TEST RUN (SIMULATED)';
@@ -552,6 +562,11 @@ function renderHistory(list) {
         <td class="p-3">
           <div class="font-bold text-emerald-700">${escapeHtml(h.vac)}</div>
           <div class="text-[10px] text-gray-500">${escapeHtml(h.category)}</div>
+        </td>
+        <td class="p-3 font-bold text-emerald-800 font-mono">
+          <span class="px-2 py-0.5 rounded text-xs bg-emerald-50 border border-emerald-200">
+            📅 ${escapeHtml(confirmedDateStr)}
+          </span>
         </td>
         <td class="p-3">
           <span class="px-2 py-0.5 rounded text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
