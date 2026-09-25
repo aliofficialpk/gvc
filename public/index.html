@@ -332,476 +332,201 @@
         
 
 
-        <!-- Section Content Panels Container -->
+        <!-- Single Scrollable Form Container - Exactly Matching Portal Screenshot -->
         <div class="flex-1 overflow-y-auto pr-1 space-y-4 text-xs">
           
-          <!-- TAB 0: Credentials -->
-          <div id="secCredentials" class="modal-sec-panel space-y-3">
-            <div class="bg-indigo-50 p-3 rounded-lg border border-indigo-100 space-y-2">
-              <div class="font-bold text-indigo-900 flex items-center gap-1.5">
-                <i data-lucide="key" class="w-4 h-4 text-indigo-600"></i>
-                GVC Portal Account Login Credentials
-              </div>
-              <p class="text-gray-600">These credentials will be used by Playwright for automated login into pk-gr-services.gvcworld.eu</p>
-              <div class="grid grid-cols-2 gap-3 pt-1">
-                <div>
-                  <label class="block font-medium text-gray-700 mb-1">GVC Username / Email *</label>
-                  <input type="text" id="inputUsername" required value="Account01" placeholder="e.g. Account01" class="input-field">
-                </div>
-                <div>
-                  <label class="block font-medium text-gray-700 mb-1">GVC Portal Password *</label>
-                  <input type="password" id="inputPassword" required value="Swift@001" placeholder="e.g. Swift@001" class="input-field">
-                </div>
-              </div>
-            </div>
-
-            <div class="grid grid-cols-2 gap-3">
-              <div>
-                <label class="block font-medium text-gray-700 mb-1">SMS OTP Mobile Phone *</label>
-                <input type="tel" id="inputPhone" required value="+923001234567" placeholder="+923001234567" class="input-field">
-              </div>
-              <div>
-                <label class="block font-medium text-gray-700 mb-1">Confirmation Email *</label>
-                <input type="email" id="inputEmail" required value="account01@gvcworld-portal.com" placeholder="account01@gvcworld-portal.com" class="input-field">
-              </div>
-            </div>
+          <!-- Blue Portal Notice Banner -->
+          <div class="bg-sky-50 border border-sky-200 rounded-lg p-3 text-sky-900 leading-relaxed text-[11px]">
+            Kindly note that this platform for online appointments has been designed to service individual applicants and their families.
           </div>
 
-          <!-- Section 1: Personal Details (1-9) -->
-          <div id="secPersonal" class="modal-sec-panel space-y-3">
-            <h4 class="font-bold text-gray-900 border-b pb-1">1. Personal Details (Fields 1 to 9)</h4>
-            <div class="grid grid-cols-2 gap-3">
+          <!-- Appointment & Category Card -->
+          <div class="bg-amber-50/70 p-4 rounded-xl border border-amber-200 space-y-3">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label class="block font-medium text-gray-700 mb-1">1. Surname / Family Name *</label>
-                <input type="text" id="inputSurname" required value="Ali" placeholder="e.g. Ali" class="input-field">
-              </div>
-              <div>
-                <label class="block font-medium text-gray-700 mb-1">2. Surname at Birth (Former Surname)</label>
-                <input type="text" id="inputSurnameAtBirth" value="Ali" placeholder="e.g. Ali" class="input-field">
-              </div>
-            </div>
-
-            <div class="grid grid-cols-3 gap-3">
-              <div>
-                <label class="block font-medium text-gray-700 mb-1">3. Given Name(s) *</label>
-                <input type="text" id="inputGivenName" required value="Muhammad" placeholder="e.g. Muhammad" class="input-field">
-              </div>
-              <div>
-                <label class="block font-medium text-gray-700 mb-1">4. Date of Birth *</label>
-                <input type="date" id="inputDob" required value="1992-05-12" class="input-field">
-              </div>
-              <div>
-                <label class="block font-medium text-gray-700 mb-1">5. Place of Birth *</label>
-                <input type="text" id="inputPlaceOfBirth" value="Islamabad" placeholder="e.g. Islamabad" class="input-field">
-              </div>
-            </div>
-
-            <div class="grid grid-cols-4 gap-3">
-              <div>
-                <label class="block font-medium text-gray-700 mb-1">6. Country of Birth *</label>
-                <input type="text" id="inputCountryOfBirth" value="Pakistan" placeholder="e.g. Pakistan" class="input-field">
-              </div>
-              <div>
-                <label class="block font-medium text-gray-700 mb-1">7. Current Nationality *</label>
-                <input type="text" id="inputNationality" required value="Pakistan" placeholder="e.g. Pakistan" class="input-field">
-              </div>
-              <div>
-                <label class="block font-medium text-gray-700 mb-1">7b. Nationality at Birth</label>
-                <input type="text" id="inputNationalityAtBirth" value="Pakistan" placeholder="e.g. Pakistan" class="input-field">
-              </div>
-              <div>
-                <label class="block font-medium text-gray-700 mb-1">8. Sex / Gender *</label>
-                <select id="selectGender" class="input-field">
-                  <option value="Male">Male</option>
-                  <option value="Female">Female</option>
-                </select>
-              </div>
-            </div>
-
-            <div>
-              <label class="block font-medium text-gray-700 mb-1">9. Civil Status (Marital Status) *</label>
-              <select id="selectCivilStatus" class="input-field">
-                <option value="Single">Single</option>
-                <option value="Married">Married</option>
-                <option value="Separated">Separated</option>
-                <option value="Divorced">Divorced</option>
-                <option value="Widow(er)">Widow(er)</option>
-                <option value="Other">Other</option>
-              </select>
-            </div>
-          </div>
-
-          <!-- TAB 2: Legal Guardian (10) -->
-          <div id="secGuardian" class="modal-sec-panel hidden space-y-3">
-            <h4 class="font-bold text-gray-900 border-b pb-1">2. Legal Guardian (Field 10)</h4>
-            <div>
-              <label class="block font-medium text-gray-700 mb-1">10. Legal Guardian (For Minors: Surname, First Name, Address, Nationality)</label>
-              <input type="text" id="inputLegalGuardian" value="N/A" placeholder="e.g. N/A or Parent Name" class="input-field">
-            </div>
-          </div>
-
-          <!-- Section 2: ID and Travel Documents -->
-          <div id="secId" class="modal-sec-panel space-y-3">
-            <h4 class="font-bold text-gray-900 border-b pb-1">3. Identity & Travel Documents (Fields 11 to 16)</h4>
-            <div class="grid grid-cols-2 gap-3">
-              <div>
-                <label class="block font-medium text-gray-700 mb-1">11. National Identity Number (CNIC) *</label>
-                <input type="text" id="inputCnicNumber" value="61101-1234567-1" placeholder="e.g. 61101-1234567-1" class="input-field font-mono">
-              </div>
-              <div>
-                <label class="block font-medium text-gray-700 mb-1">12. Type of Travel Document *</label>
-                <select id="selectTravelDocumentType" class="input-field">
-                  <option value="Ordinary Passport">Ordinary Passport</option>
-                  <option value="Diplomatic Passport">Diplomatic Passport</option>
-                  <option value="Service Passport">Service Passport</option>
-                  <option value="Official Passport">Official Passport</option>
-                  <option value="Special Passport">Special Passport</option>
-                </select>
-              </div>
-            </div>
-
-            <div class="grid grid-cols-3 gap-3">
-              <div>
-                <label class="block font-medium text-gray-700 mb-1">13. Passport Number *</label>
-                <input type="text" id="inputPassportNumber" required value="PK9842104" placeholder="e.g. PK9842104" class="input-field font-mono uppercase">
-              </div>
-              <div>
-                <label class="block font-medium text-gray-700 mb-1">14. Date of Issue *</label>
-                <input type="date" id="inputPassportIssue" value="2021-08-15" class="input-field">
-              </div>
-              <div>
-                <label class="block font-medium text-gray-700 mb-1">15. Expiry Date *</label>
-                <input type="date" id="inputPassportExpiry" required value="2031-08-15" class="input-field">
-              </div>
-            </div>
-
-            <div>
-              <label class="block font-medium text-gray-700 mb-1">16. Issued by (Authority & Country) *</label>
-              <input type="text" id="inputPassportPlace" value="Islamabad, Pakistan" placeholder="e.g. Islamabad, Pakistan" class="input-field">
-            </div>
-          </div>
-
-          <!-- TAB 4: EU Family Member (17,18) -->
-          <div id="secEu" class="modal-sec-panel hidden space-y-3">
-            <h4 class="font-bold text-gray-900 border-b pb-1">4. EU, EEA or CH Citizen Family Member (Fields 17, 18)</h4>
-            <div>
-              <label class="block font-medium text-gray-700 mb-1">17, 18. Family Member Details (Surname, Given Name, DOB, Nationality, Travel Document, Relationship)</label>
-              <input type="text" id="inputEuFamilyMember" value="N/A" placeholder="e.g. N/A (Leave if not applicable)" class="input-field">
-            </div>
-          </div>
-
-          <!-- TAB 5: Residence (19,20) - [Live Screenshots 4 & 5] -->
-          <div id="secResidence" class="modal-sec-panel hidden space-y-3">
-            <h4 class="font-bold text-gray-900 border-b pb-1">5. Residence Details (Fields 19.1 to 19.7 & 20.1)</h4>
-            <div class="grid grid-cols-3 gap-3">
-              <div>
-                <label class="block font-medium text-gray-700 mb-1">19.1 Country *</label>
-                <select id="selectResidenceCountry" class="input-field">
-                  <option value="PAKISTAN">PAKISTAN</option>
+                <label class="block font-semibold text-gray-700 mb-1">VAC Location *</label>
+                <select id="selectVac" class="input-field bg-white">
+                  <option value="Islamabad VAC">Islamabad Visa Application Center for Greece</option>
+                  <option value="Lahore VAC">Lahore Visa Application Center for Greece</option>
+                  <option value="Karachi VAC">Karachi Visa Application Center for Greece</option>
                 </select>
               </div>
               <div>
-                <label class="block font-medium text-gray-700 mb-1">19.2 City *</label>
-                <input type="text" id="inputResidenceCity" value="Islamabad" placeholder="e.g. Islamabad" class="input-field">
-              </div>
-              <div>
-                <label class="block font-medium text-gray-700 mb-1">19.4 Postal Code *</label>
-                <input type="text" id="inputResidencePostal" value="44000" placeholder="e.g. 44000" class="input-field font-mono">
-              </div>
-            </div>
-
-            <div>
-              <label class="block font-medium text-gray-700 mb-1">19.3 Address (Street, House Number, Apartment) *</label>
-              <input type="text" id="inputResidenceAddress" value="House 123, Street 45, Sector F-8/2" placeholder="Street Address" class="input-field">
-            </div>
-
-            <div class="grid grid-cols-3 gap-3">
-              <div>
-                <label class="block font-medium text-gray-700 mb-1">19.5 Email Address *</label>
-                <input type="email" id="inputResidenceEmail" value="account01@gvcworld-portal.com" placeholder="email@domain.com" class="input-field">
-              </div>
-              <div>
-                <label class="block font-medium text-gray-700 mb-1">19.6 Phone Number *</label>
-                <input type="tel" id="inputResidencePhone" value="+92511234567" placeholder="+92511234567" class="input-field font-mono">
-              </div>
-              <div>
-                <label class="block font-medium text-gray-700 mb-1">19.7 Mobile Number</label>
-                <input type="tel" id="inputResidenceMobile" value="+923001234567" placeholder="+923001234567" class="input-field font-mono">
-              </div>
-            </div>
-
-            <div class="grid grid-cols-2 gap-3 pt-1 border-t border-gray-100">
-              <div>
-                <label class="block font-medium text-gray-700 mb-1">Same Address for Courier Delivery?</label>
-                <select id="selectCourierSameAddress" class="input-field">
-                  <option value="Yes">Yes</option>
-                  <option value="No">No</option>
-                </select>
-              </div>
-              <div>
-                <label class="block font-medium text-gray-700 mb-1">20.1 Country (Residence in Country Other Than Nationality)</label>
-                <select id="selectResidenceOtherCountryName" class="input-field">
-                  <option value="N/A">N/A (Not Applicable)</option>
-                  <option value="PAKISTAN">PAKISTAN</option>
-                </select>
-              </div>
-            </div>
-          </div>
-
-          <!-- TAB 6: Occupation or School (21,22) - [Live Screenshot 3] -->
-          <div id="secOccupation" class="modal-sec-panel hidden space-y-3">
-            <h4 class="font-bold text-gray-900 border-b pb-1">6. Occupation & Employer Details (Fields 21 to 22.5)</h4>
-            <div>
-              <label class="block font-medium text-gray-700 mb-1">21. Current Occupation *</label>
-              <select id="selectOccupation" class="input-field">
-                <option value="SOFTWARE ENGINEER">SOFTWARE ENGINEER</option>
-                <option value="BUSINESS MANAGER">BUSINESS MANAGER</option>
-                <option value="COMPANY DIRECTOR">COMPANY DIRECTOR</option>
-                <option value="STUDENT">STUDENT</option>
-                <option value="SELF EMPLOYED">SELF EMPLOYED</option>
-                <option value="OTHER">OTHER</option>
-              </select>
-            </div>
-
-            <div class="grid grid-cols-2 gap-3">
-              <div>
-                <label class="block font-medium text-gray-700 mb-1">22.1 Employer's or School's Name *</label>
-                <input type="text" id="inputEmployerName" value="Tech Solutions Ltd" placeholder="Employer Name" class="input-field">
-              </div>
-              <div>
-                <label class="block font-medium text-gray-700 mb-1">22.2 Employer's or School's Street Address *</label>
-                <input type="text" id="inputEmployerStreet" value="Blue Area, Jinnah Avenue" placeholder="Street Address" class="input-field">
-              </div>
-            </div>
-
-            <div class="grid grid-cols-3 gap-3">
-              <div>
-                <label class="block font-medium text-gray-700 mb-1">22.3 Employer's or School's Postal Code *</label>
-                <input type="text" id="inputEmployerPostal" value="44000" placeholder="44000" class="input-field font-mono">
-              </div>
-              <div>
-                <label class="block font-medium text-gray-700 mb-1">22.4 Employer's or School's City *</label>
-                <input type="text" id="inputEmployerCity" value="Islamabad" placeholder="City" class="input-field">
-              </div>
-              <div>
-                <label class="block font-medium text-gray-700 mb-1">22.5 Employer's or School's Country *</label>
-                <select id="selectEmployerCountry" class="input-field">
-                  <option value="PAKISTAN">PAKISTAN</option>
-                </select>
-              </div>
-            </div>
-          </div>
-
-          <!-- Section 3: Travel & Category Selection -->
-          <div id="secTravel" class="modal-sec-panel space-y-3">
-            <h4 class="font-bold text-gray-900 border-b pb-1">7. Travel Information (Fields 23.1 to 27.2)</h4>
-            <div class="grid grid-cols-3 gap-3">
-              <div>
-                <label class="block font-medium text-gray-700 mb-1">Visa Application Centre *</label>
-                <select id="selectVac" class="input-field">
-                  <option value="Islamabad VAC">Islamabad VAC (Islamabad G-4)</option>
-                  <option value="Lahore VAC">Lahore VAC (Lahore Gulberg III)</option>
-                  <option value="Karachi VAC">Karachi VAC (Karachi Clifton)</option>
-                </select>
-              </div>
-              <div>
-                <label class="block font-medium text-gray-700 mb-1">Appointment for (Visa Category) *</label>
-                <select id="selectCategory" class="input-field">
+                <label class="block font-semibold text-gray-700 mb-1">Appointment for *</label>
+                <select id="selectCategory" class="input-field bg-white">
                   <option value="Submission Schengen Visa (Short term – Type C)">Submission Schengen Visa (Short term – Type C)</option>
                   <option value="National visa (Long term - type D)">National visa (Long term - type D)</option>
                   <option value="Prime Time (optional service at an additional charge)">Prime Time (optional service at an additional charge)</option>
                   <option value="Long-Term Type D (Seasonal/Dependent Employment)">Long-Term Type D (Seasonal/Dependent Employment)</option>
                 </select>
               </div>
-              <div>
-                <label class="block font-medium text-gray-700 mb-1">23.1 Main Purpose of Journey - Travel Purpose *</label>
-                <select id="selectTravelPurpose" class="input-field">
-                  <option value="TOURISM">TOURISM</option>
-                  <option value="BUSINESS">BUSINESS</option>
-                  <option value="WORK">WORK</option>
-                  <option value="STUDY">STUDY</option>
-                  <option value="FAMILY VISIT">FAMILY VISIT</option>
-                </select>
-              </div>
             </div>
 
-            <div class="grid grid-cols-2 gap-3">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
               <div>
-                <label class="block font-medium text-gray-700 mb-1">23.2.1 Other Purpose 1</label>
-                <input type="text" id="inputOtherPurpose" value="Other" placeholder="Other" class="input-field">
-              </div>
-              <div>
-                <label class="block font-medium text-gray-700 mb-1">24. Additional Information on Purpose of Stay</label>
-                <input type="text" id="inputPurposeAdditionalInfo" value="Sightseeing & Tourist Visit" placeholder="Additional Info" class="input-field">
-              </div>
-            </div>
-
-            <div class="grid grid-cols-4 gap-3">
-              <div>
-                <label class="block font-medium text-gray-700 mb-1">25.1 Member State 1 *</label>
-                <select id="selectDestinationState1" class="input-field">
-                  <option value="GREECE">GREECE</option>
+                <label class="block font-semibold text-gray-700 mb-1">Booking as *</label>
+                <select id="selectBookingAs" class="input-field bg-white">
+                  <option value="Individual">Individual</option>
+                  <option value="Family">Family</option>
+                  <option value="Group">Group</option>
                 </select>
               </div>
               <div>
-                <label class="block font-medium text-gray-700 mb-1">25.2 Member State 2</label>
-                <input type="text" id="inputDestinationState2" value="" placeholder="N/A" class="input-field">
+                <label class="block font-semibold text-gray-700 mb-1">E-mail *</label>
+                <input type="email" id="inputEmail" required value="saniawan445@gmail.com" placeholder="saniawan445@gmail.com" class="input-field bg-white">
               </div>
               <div>
-                <label class="block font-medium text-gray-700 mb-1">26. Member State of First Entry *</label>
-                <select id="selectFirstEntryState" class="input-field">
-                  <option value="GREECE">GREECE</option>
-                </select>
-              </div>
-              <div>
-                <label class="block font-medium text-gray-700 mb-1">27. Number of Entries Requested *</label>
-                <select id="selectEntriesRequested" class="input-field">
-                  <option value="SINGLE">SINGLE</option>
-                  <option value="TWO">TWO</option>
-                  <option value="MULTIPLE">MULTIPLE</option>
-                </select>
-              </div>
-            </div>
-
-            <div class="grid grid-cols-3 gap-3">
-              <div>
-                <label class="block font-medium text-gray-700 mb-1">27.0 Intended Date of First Arrival *</label>
-                <input type="date" id="inputIntendedArrivalDate" value="2026-10-15" class="input-field">
-              </div>
-              <div>
-                <label class="block font-medium text-gray-700 mb-1">27.1 Intended Date of Departure *</label>
-                <input type="date" id="inputIntendedDepartureDate" value="2026-10-30" class="input-field">
-              </div>
-              <div>
-                <label class="block font-medium text-gray-700 mb-1">27.2 Duration of Stay (in days) *</label>
-                <input type="number" id="inputDurationOfStayDays" value="15" placeholder="15" class="input-field font-mono">
+                <label class="block font-semibold text-gray-700 mb-1">Phone number *</label>
+                <div class="flex gap-1">
+                  <select id="selectPhonePrefix" class="input-field bg-white w-32 shrink-0">
+                    <option value="PAKISTAN +92">PAKISTAN +92</option>
+                  </select>
+                  <input type="tel" id="inputPhone" required value="3709578308" placeholder="3709578308" class="input-field font-mono bg-white flex-1">
+                </div>
               </div>
             </div>
           </div>
 
-          <!-- TAB 8: Previous Visas & Permits (28,29) -->
-          <div id="secVisas" class="modal-sec-panel hidden space-y-3">
-            <h4 class="font-bold text-gray-900 border-b pb-1">8. Previous Visas & Permits (Fields 28, 29) [Matching Portal Screenshot 5]</h4>
-            <div class="grid grid-cols-2 gap-3">
+          <!-- Client Information Table Card -->
+          <div class="bg-gray-50 p-4 rounded-xl border border-gray-200 space-y-3">
+            <div class="font-bold text-gray-900 border-b pb-1 text-xs">
+              Client Information (Persons for this Appointment)
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label class="block font-medium text-gray-700 mb-1">28. Fingerprints Collected Previously for Schengen Visa *</label>
-                <select id="selectFingerprintsCollected" class="input-field">
-                  <option value="No">No</option>
-                  <option value="Yes">Yes (Previously Collected)</option>
+                <label class="block font-semibold text-gray-700 mb-1">Surname *</label>
+                <input type="text" id="inputSurname" required value="ARSHAD" placeholder="e.g. ARSHAD" class="input-field bg-white uppercase">
+              </div>
+              <div>
+                <label class="block font-semibold text-gray-700 mb-1">Name (Given Name) *</label>
+                <input type="text" id="inputGivenName" required value="HAMZA" placeholder="e.g. HAMZA" class="input-field bg-white uppercase">
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div>
+                <label class="block font-semibold text-gray-700 mb-1">Date of Birth *</label>
+                <input type="date" id="inputDob" required value="1995-04-12" class="input-field bg-white">
+              </div>
+              <div>
+                <label class="block font-semibold text-gray-700 mb-1">Passport *</label>
+                <input type="text" id="inputPassportNumber" required value="PK1234567" placeholder="Passport Number" class="input-field font-mono bg-white uppercase">
+              </div>
+              <div>
+                <label class="block font-semibold text-gray-700 mb-1">Passport's Expiration Date *</label>
+                <input type="date" id="inputPassportExpiry" required value="2030-04-12" class="input-field bg-white">
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="block font-semibold text-gray-700 mb-1">Gender *</label>
+                <select id="selectGender" class="input-field bg-white">
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
                 </select>
               </div>
               <div>
-                <label class="block font-medium text-gray-700 mb-1">29. Entry Permit for Final Destination (if non-Schengen) *</label>
-                <select id="selectEntryPermitFinal" class="input-field">
-                  <option value="N/A">N/A (Not Applicable)</option>
-                  <option value="Yes">Yes</option>
-                  <option value="No">No</option>
-                </select>
+                <label class="block font-semibold text-gray-700 mb-1">Nationality *</label>
+                <input type="text" id="inputNationality" required value="PAKISTAN" placeholder="PAKISTAN" class="input-field bg-white uppercase">
               </div>
             </div>
           </div>
 
-          <!-- TAB 9: Hosting (30,31) -->
-          <div id="secHosting" class="modal-sec-panel hidden space-y-3">
-            <h4 class="font-bold text-gray-900 border-b pb-1">9. Hosting Details (Fields 30, 31)</h4>
+          <!-- Appointment Date Selection Card -->
+          <div class="bg-emerald-50/60 p-4 rounded-xl border border-emerald-200/80 space-y-3">
+            <div class="font-bold text-emerald-900 flex items-center gap-1.5 text-xs">
+              <i data-lucide="calendar" class="w-4 h-4 text-emerald-700"></i>
+              Target Appointment Date
+            </div>
             <div>
-              <label class="block font-medium text-gray-700 mb-1">30, 31. Inviting Person / Host Company (Name, Address, Email, Phone) *</label>
-              <input type="text" id="inputHostInfo" value="Hotel Royal Olympic, Athanasiou Diakou 28, Athens, Greece, Tel: +302109288400" placeholder="Host details" class="input-field">
+              <label class="block font-semibold text-gray-700 mb-1">Appointment Date *</label>
+              <input type="date" id="inputIntendedArrivalDate" value="2026-09-24" class="input-field bg-white">
             </div>
           </div>
 
-          <!-- TAB 10: Accommodation (30.2) -->
-          <div id="secAccommodation" class="modal-sec-panel hidden space-y-3">
-            <h4 class="font-bold text-gray-900 border-b pb-1">10. Accommodation (Field 30.2) [Matching Portal Screenshot 4]</h4>
-            <div class="grid grid-cols-2 gap-3">
-              <div>
-                <label class="block font-medium text-gray-700 mb-1">30.2.1 Hotel/Accommodation Name *</label>
-                <input type="text" id="inputHotelName" value="Royal Olympic Hotel Athens" placeholder="Hotel Name" class="input-field">
-              </div>
-              <div>
-                <label class="block font-medium text-gray-700 mb-1">30.2.2 Street *</label>
-                <input type="text" id="inputHotelStreet" value="28 Athanasiou Diakou Street" placeholder="Street Address" class="input-field">
-              </div>
+          <!-- Portal Account Credentials Card -->
+          <div class="bg-indigo-50/70 p-4 rounded-xl border border-indigo-200 space-y-3">
+            <div class="font-bold text-indigo-900 flex items-center gap-1.5 text-xs">
+              <i data-lucide="key" class="w-4 h-4 text-indigo-700"></i>
+              GVC Portal Account Login Credentials
             </div>
-
-            <div class="grid grid-cols-3 gap-3">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label class="block font-medium text-gray-700 mb-1">30.2.3 City *</label>
-                <input type="text" id="inputHotelCity" value="Athens" placeholder="City" class="input-field">
+                <label class="block font-semibold text-gray-700 mb-1">GVC Username / Email *</label>
+                <input type="text" id="inputUsername" required value="Account01" placeholder="Account01" class="input-field bg-white">
               </div>
               <div>
-                <label class="block font-medium text-gray-700 mb-1">30.2.4 Postal Code *</label>
-                <input type="text" id="inputHotelPostal" value="11743" placeholder="11743" class="input-field font-mono">
-              </div>
-              <div>
-                <label class="block font-medium text-gray-700 mb-1">30.2.5 Email Address</label>
-                <input type="email" id="inputHotelEmail" value="info@royalolympic.gr" placeholder="hotel@email.com" class="input-field">
-              </div>
-            </div>
-
-            <div class="grid grid-cols-2 gap-3">
-              <div>
-                <label class="block font-medium text-gray-700 mb-1">Country Prefix *</label>
-                <select id="selectHotelCountryPrefix" class="input-field">
-                  <option value="GREECE +30">GREECE +30</option>
-                  <option value="PAKISTAN +92">PAKISTAN +92</option>
-                </select>
-              </div>
-              <div>
-                <label class="block font-medium text-gray-700 mb-1">30.2.6 Phone Number *</label>
-                <input type="tel" id="inputHotelPhone" value="2109288400" placeholder="2109288400" class="input-field font-mono">
+                <label class="block font-semibold text-gray-700 mb-1">GVC Portal Password *</label>
+                <input type="password" id="inputPassword" required value="Swift@001" placeholder="Password" class="input-field bg-white">
               </div>
             </div>
           </div>
 
-          <!-- TAB 11: Cost of Travelling (32) -->
-          <div id="secCost" class="modal-sec-panel hidden space-y-3">
-            <h4 class="font-bold text-gray-900 border-b pb-1">11. Cost of Travelling (Field 32)</h4>
-            <div>
-              <label class="block font-medium text-gray-700 mb-1">32. Cost of Travelling Covered By *</label>
-              <select id="selectTravelCostCoveredBy" class="input-field">
-                <option value="Applicant himself">Applicant himself</option>
-                <option value="Sponsor / Host">Sponsor / Host</option>
-                <option value="Other">Other</option>
-              </select>
-            </div>
-          </div>
-
-          <!-- TAB 12,13: Person Filling & Travel Medical Insurance (33) -->
-          <div id="secInsurance" class="modal-sec-panel hidden space-y-3">
-            <h4 class="font-bold text-gray-900 border-b pb-1">12, 13. Person Filling & Insurance (Field 33) [Matching Portal Screenshot 3]</h4>
-            <div>
-              <label class="block font-medium text-gray-700 mb-1">33. Person Filling Application *</label>
-              <select id="selectPersonFilling" class="input-field">
-                <option value="Applicant Himself">Applicant Himself</option>
-                <option value="Representative / Agency">Representative / Agency</option>
-              </select>
-            </div>
-
-            <div class="p-3 bg-amber-50 border border-amber-200 rounded-lg space-y-2">
-              <label class="block font-bold text-amber-900">33. Do you have 100% compliant travel medical insurance which includes minimum coverage 30,000 EURO? *</label>
-              <select id="selectInsuranceDeclaration" class="input-field">
-                <option value="Yes - 100% Compliant Schengen Insurance (Min 30,000 EUR Coverage)">Yes - 100% Compliant Schengen Insurance (Min 30,000 EUR Coverage)</option>
-              </select>
-              <div class="flex items-center space-x-2 pt-2 border-t border-amber-200">
-                <input type="checkbox" id="checkAccuracyConfirmation" checked class="w-4 h-4 text-emerald-600 rounded">
-                <label for="checkAccuracyConfirmation" class="font-semibold text-gray-800 text-[11px]">
-                  I have verified that the information filled in is accurate, proceed to enable submission. *
-                </label>
-              </div>
-            </div>
+          <!-- Hidden Supplemental Inputs (Preserves 100% Schema Backward Compatibility) -->
+          <div class="hidden">
+            <input type="number" id="inputDurationOfStayDays" value="15">
+            <input type="text" id="inputSurnameAtBirth" value="ARSHAD">
+            <input type="text" id="inputPlaceOfBirth" value="Islamabad">
+            <input type="text" id="inputCountryOfBirth" value="PAKISTAN">
+            <input type="text" id="inputNationalityAtBirth" value="PAKISTAN">
+            <select id="selectCivilStatus"><option value="Single">Single</option></select>
+            <input type="text" id="inputLegalGuardian" value="N/A">
+            <input type="text" id="inputCnicNumber" value="61101-1234567-1">
+            <select id="selectTravelDocumentType"><option value="Ordinary Passport">Ordinary Passport</option></select>
+            <input type="date" id="inputPassportIssue" value="2020-04-12">
+            <input type="text" id="inputPassportPlace" value="Islamabad, Pakistan">
+            <input type="text" id="inputEuFamilyMember" value="N/A">
+            <select id="selectResidenceCountry"><option value="PAKISTAN">PAKISTAN</option></select>
+            <input type="text" id="inputResidenceCity" value="Islamabad">
+            <input type="text" id="inputResidencePostal" value="44000">
+            <input type="text" id="inputResidenceAddress" value="House 123, Street 45, Sector F-8/2">
+            <input type="email" id="inputResidenceEmail" value="saniawan445@gmail.com">
+            <input type="tel" id="inputResidencePhone" value="+923709578308">
+            <input type="tel" id="inputResidenceMobile" value="+923709578308">
+            <select id="selectCourierSameAddress"><option value="Yes">Yes</option></select>
+            <select id="selectResidenceOtherCountryName"><option value="N/A">N/A</option></select>
+            <select id="selectOccupation"><option value="SOFTWARE ENGINEER">SOFTWARE ENGINEER</option></select>
+            <input type="text" id="inputEmployerName" value="Tech Solutions Ltd">
+            <input type="text" id="inputEmployerStreet" value="Blue Area, Jinnah Avenue">
+            <input type="text" id="inputEmployerPostal" value="44000">
+            <input type="text" id="inputEmployerCity" value="Islamabad">
+            <select id="selectEmployerCountry"><option value="PAKISTAN">PAKISTAN</option></select>
+            <select id="selectTravelPurpose"><option value="TOURISM">TOURISM</option></select>
+            <input type="text" id="inputOtherPurpose" value="Other">
+            <input type="text" id="inputPurposeAdditionalInfo" value="Sightseeing & Tourist Visit">
+            <select id="selectDestinationState1"><option value="GREECE">GREECE</option></select>
+            <input type="text" id="inputDestinationState2" value="">
+            <select id="selectFirstEntryState"><option value="GREECE">GREECE</option></select>
+            <select id="selectEntriesRequested"><option value="SINGLE">SINGLE</option></select>
+            <input type="date" id="inputIntendedDepartureDate" value="2026-10-30">
+            <select id="selectFingerprintsCollected"><option value="No">No</option></select>
+            <select id="selectEntryPermitFinal"><option value="N/A">N/A</option></select>
+            <input type="text" id="inputHostInfo" value="Hotel Royal Olympic, Athens, Greece">
+            <input type="text" id="inputHotelName" value="Royal Olympic Hotel Athens">
+            <input type="text" id="inputHotelStreet" value="28 Athanasiou Diakou Street">
+            <input type="text" id="inputHotelCity" value="Athens">
+            <input type="text" id="inputHotelPostal" value="11743">
+            <input type="email" id="inputHotelEmail" value="info@royalolympic.gr">
+            <select id="selectHotelCountryPrefix"><option value="GREECE +30">GREECE +30</option></select>
+            <input type="tel" id="inputHotelPhone" value="2109288400">
+            <select id="selectTravelCostCoveredBy"><option value="Applicant himself">Applicant himself</option></select>
+            <select id="selectPersonFilling"><option value="Applicant Himself">Applicant Himself</option></select>
+            <select id="selectInsuranceDeclaration"><option value="Yes - 100% Compliant Schengen Insurance (Min 30,000 EUR Coverage)">Yes - 100% Compliant Schengen Insurance (Min 30,000 EUR Coverage)</option></select>
+            <input type="checkbox" id="checkAccuracyConfirmation" checked>
           </div>
 
         </div>
 
         <!-- Modal Footer Actions -->
         <div class="pt-3 border-t border-gray-200 flex items-center justify-between shrink-0">
-          <div class="text-[11px] text-gray-500">All 33 fields will be auto-injected by Playwright upon slot detection.</div>
+          <div class="text-[11px] text-gray-500">Exact "Book Appointment" fields mapped.</div>
           <div class="flex items-center space-x-2">
             <button type="button" onclick="closeApplicantModal()" class="px-4 py-2 text-xs font-medium text-gray-600 hover:text-gray-800">Cancel</button>
             <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2 rounded-md text-xs font-bold shadow-md flex items-center gap-1.5">
               <i data-lucide="save" class="w-4 h-4"></i>
-              Save Complete 33-Field Profile
+              Save Appointment Profile
             </button>
           </div>
         </div>

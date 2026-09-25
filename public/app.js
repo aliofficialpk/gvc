@@ -554,7 +554,7 @@ function openStageAuditModal(historyId) {
     { id: 1, name: 'Stage 1: Gateway Session & Perimeter Security', status: item.status === 'WAF_GATEWAY_PROTECTED' ? 'SHIELD_ACTIVE' : 'CLEARED', note: item.status === 'WAF_GATEWAY_PROTECTED' ? 'Imperva WAF shield active on direct subdomain link. Session cookies initialized via main gateway.' : 'Gateway connection verified.' },
     { id: 2, name: 'Stage 2: Portal Account Authentication', status: 'CLEARED', note: `Credentials (Account01 / Swift@001) verified & mapped.` },
     { id: 3, name: 'Stage 3: Centre & Category Matching', status: 'CLEARED', note: `${item.vac} | ${item.category}` },
-    { id: 4, name: 'Stage 4: 16-Field Applicant Profile Pre-Fill', status: 'CLEARED', note: `16/16 Compulsory Fields Matched (100% Match Rate).` },
+    { id: 4, name: 'Stage 4: Appointment Form Fields Pre-Fill', status: 'CLEARED', note: `Compulsory Appointment Fields Matched (100% Match Rate).` },
     { id: 5, name: 'Stage 5: OTP / SMS Verification Prompt', status: item.status === 'OTP_SUBMITTED' ? 'CLEARED' : 'ARMED_FOR_PROMPT', note: item.status === 'OTP_SUBMITTED' ? 'OTP injected & verified on portal.' : 'System armed to display OTP prompt modal upon SMS code dispatch.' },
     { id: 6, name: 'Stage 6: Final Slot Confirmation', status: 'QUEUED_FOR_OPENING', note: 'Queued for automatic auto-apply submission as soon as slot opens.' }
   ];

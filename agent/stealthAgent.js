@@ -20,97 +20,28 @@ class MonitorAgent extends EventEmitter {
     this.registerUrl = 'https://pk-gr-services.gvcworld.eu/register/PK/en?lang=en_US';
 
     this.canonicalFormFields = [
-      // Account Credentials
-      { fieldKey: 'username', label: 'Portal Username / Account Email', type: 'text', required: true, stage: 'Account Authentication', gvcSelector: 'input[name="email"], input[name="username"], #email', matchProp: 'username' },
-      { fieldKey: 'password', label: 'Portal Password', type: 'password', required: true, stage: 'Account Authentication', gvcSelector: 'input[name="password"], #password', matchProp: 'password' },
+      // Portal Account Credentials
+      { fieldKey: 'username', label: 'GVC Username / Email', type: 'text', required: true, stage: 'Authentication', gvcSelector: 'input[name="email"], input[name="username"], #email', matchProp: 'username' },
+      { fieldKey: 'password', label: 'GVC Portal Password', type: 'password', required: true, stage: 'Authentication', gvcSelector: 'input[name="password"], #password', matchProp: 'password' },
       
-      // Section 1: Personal (1-9)
-      { fieldKey: 'surname', label: '1. Surname (Family Name)', type: 'text', required: true, stage: '1. Personal (1-9)', gvcSelector: 'input[name="surname"], #surname', matchProp: 'surname' },
-      { fieldKey: 'surname_at_birth', label: '2. Surname at Birth (Former Family Name)', type: 'text', required: false, stage: '1. Personal (1-9)', gvcSelector: 'input[name="surname_at_birth"], #surname_at_birth', matchProp: 'surnameAtBirth' },
-      { fieldKey: 'given_name', label: '3. Given Name(s) (First Name)', type: 'text', required: true, stage: '1. Personal (1-9)', gvcSelector: 'input[name="first_name"], input[name="given_name"], #first_name', matchProp: 'givenName' },
-      { fieldKey: 'dob', label: '4. Date of Birth', type: 'date', required: true, stage: '1. Personal (1-9)', gvcSelector: 'input[name="dob"], #dob', matchProp: 'dob' },
-      { fieldKey: 'place_of_birth', label: '5. Place of Birth', type: 'text', required: true, stage: '1. Personal (1-9)', gvcSelector: 'input[name="place_of_birth"], #place_of_birth', matchProp: 'placeOfBirth' },
-      { fieldKey: 'country_of_birth', label: '6. Country of Birth', type: 'text', required: true, stage: '1. Personal (1-9)', gvcSelector: 'input[name="country_of_birth"], #country_of_birth', matchProp: 'countryOfBirth' },
-      { fieldKey: 'nationality', label: '7. Current Nationality', type: 'text', required: true, stage: '1. Personal (1-9)', gvcSelector: 'input[name="nationality"], #nationality', matchProp: 'nationality' },
-      { fieldKey: 'nationality_at_birth', label: '7b. Nationality at Birth', type: 'text', required: false, stage: '1. Personal (1-9)', gvcSelector: 'input[name="nationality_at_birth"], #nationality_at_birth', matchProp: 'nationalityAtBirth' },
-      { fieldKey: 'gender', label: '8. Sex / Gender', type: 'select', required: true, options: ['Male', 'Female'], stage: '1. Personal (1-9)', gvcSelector: 'select[name="gender"], #gender', matchProp: 'gender' },
-      { fieldKey: 'civil_status', label: '9. Civil Status (Marital)', type: 'select', required: true, options: ['Single', 'Married', 'Separated', 'Divorced', 'Widow(er)', 'Other'], stage: '1. Personal (1-9)', gvcSelector: 'select[name="civil_status"], #civil_status', matchProp: 'civilStatus' },
+      // Appointment & VAC Location
+      { fieldKey: 'vac', label: 'VAC Location', type: 'select', required: true, options: ['Islamabad Visa Application Center for Greece', 'Lahore Visa Application Center for Greece', 'Karachi Visa Application Center for Greece'], stage: 'Appointment Details', gvcSelector: 'select[name="vac_id"], #vac_id', matchProp: 'vac' },
+      { fieldKey: 'category', label: 'Appointment for', type: 'select', required: true, options: ['Submission Schengen Visa (Short term – Type C)', 'National visa (Long term - type D)', 'Prime Time (optional service at an additional charge)', 'Long-Term Type D (Seasonal/Dependent Employment)'], stage: 'Appointment Details', gvcSelector: 'select[name="category_id"], #category_id', matchProp: 'category' },
+      { fieldKey: 'booking_as', label: 'Booking as', type: 'select', required: true, options: ['Individual', 'Family', 'Group'], stage: 'Appointment Details', gvcSelector: 'select[name="booking_as"], #booking_as', matchProp: 'bookingAs' },
+      { fieldKey: 'email', label: 'E-mail', type: 'email', required: true, stage: 'Contact Details', gvcSelector: 'input[name="email"], #email', matchProp: 'email' },
+      { fieldKey: 'phone', label: 'Phone number', type: 'tel', required: true, stage: 'Contact Details', gvcSelector: 'input[name="phone"], #phone', matchProp: 'phone' },
 
-      // Section 2: Legal Guardian (10)
-      { fieldKey: 'legal_guardian', label: '10. Legal Guardian (Surname, First Name, Address, Nationality)', type: 'text', required: false, stage: '2. Legal Guardian (10)', gvcSelector: 'input[name="legal_guardian"], #legal_guardian', matchProp: 'legalGuardian' },
+      // Client Information
+      { fieldKey: 'surname', label: 'Surname', type: 'text', required: true, stage: 'Client Information', gvcSelector: 'input[name="surname"], #surname', matchProp: 'surname' },
+      { fieldKey: 'given_name', label: 'Name (Given Name)', type: 'text', required: true, stage: 'Client Information', gvcSelector: 'input[name="first_name"], input[name="given_name"], #first_name', matchProp: 'givenName' },
+      { fieldKey: 'dob', label: 'Date of Birth', type: 'date', required: true, stage: 'Client Information', gvcSelector: 'input[name="dob"], #dob', matchProp: 'dob' },
+      { fieldKey: 'passport_number', label: 'Passport', type: 'text', required: true, stage: 'Client Information', gvcSelector: 'input[name="passport_no"], #passport_no', matchProp: 'passportNumber' },
+      { fieldKey: 'passport_expiry', label: "Passport's Expiration Date", type: 'date', required: true, stage: 'Client Information', gvcSelector: 'input[name="passport_expiry"], #passport_expiry', matchProp: 'passportExpiry' },
+      { fieldKey: 'gender', label: 'Gender', type: 'select', required: true, options: ['Male', 'Female'], stage: 'Client Information', gvcSelector: 'select[name="gender"], #gender', matchProp: 'gender' },
+      { fieldKey: 'nationality', label: 'Nationality', type: 'text', required: true, stage: 'Client Information', gvcSelector: 'input[name="nationality"], #nationality', matchProp: 'nationality' },
 
-      // Section 3: ID and Travel Documents (11-16)
-      { fieldKey: 'cnic_number', label: '11. National Identity Number (CNIC)', type: 'text', required: true, stage: '3. ID & Travel Documents (11-16)', gvcSelector: 'input[name="cnic_no"], #cnic_no', matchProp: 'cnicNumber' },
-      { fieldKey: 'travel_document_type', label: '12. Type of Travel Document', type: 'select', required: true, options: ['Ordinary Passport', 'Diplomatic Passport', 'Service Passport', 'Official Passport', 'Special Passport'], stage: '3. ID & Travel Documents (11-16)', gvcSelector: 'select[name="doc_type"], #doc_type', matchProp: 'travelDocumentType' },
-      { fieldKey: 'passport_number', label: '13. Passport Number', type: 'text', required: true, stage: '3. ID & Travel Documents (11-16)', gvcSelector: 'input[name="passport_no"], #passport_no', matchProp: 'passportNumber' },
-      { fieldKey: 'passport_issue', label: '14. Date of Issue', type: 'date', required: true, stage: '3. ID & Travel Documents (11-16)', gvcSelector: 'input[name="passport_issue"], #passport_issue', matchProp: 'passportIssue' },
-      { fieldKey: 'passport_expiry', label: '15. Valid Until (Expiry Date)', type: 'date', required: true, stage: '3. ID & Travel Documents (11-16)', gvcSelector: 'input[name="passport_expiry"], #passport_expiry', matchProp: 'passportExpiry' },
-      { fieldKey: 'passport_place', label: '16. Issued by (Authority & Country)', type: 'text', required: true, stage: '3. ID & Travel Documents (11-16)', gvcSelector: 'input[name="passport_place"], #passport_place', matchProp: 'passportPlace' },
-
-      // Section 4: EU Family Member (17,18)
-      { fieldKey: 'eu_family_member', label: '17,18. EU/EEA or CH Citizen Family Member Details', type: 'text', required: false, stage: '4. EU Family Member (17,18)', gvcSelector: 'input[name="eu_family_member"], #eu_family_member', matchProp: 'euFamilyMember' },
-
-      // Section 5: Residence (19,20) - [Live Screenshots 4 & 5]
-      { fieldKey: 'residence_country', label: '19.1 Country *', type: 'select', required: true, options: ['PAKISTAN'], stage: '5. Residence (19,20)', gvcSelector: 'select[name="residence_country"], #residence_country', matchProp: 'residenceCountry' },
-      { fieldKey: 'residence_city', label: '19.2 City *', type: 'text', required: true, stage: '5. Residence (19,20)', gvcSelector: 'input[name="residence_city"], #residence_city', matchProp: 'residenceCity' },
-      { fieldKey: 'residence_address', label: '19.3 Address (Street, House Number, Apartment) *', type: 'text', required: true, stage: '5. Residence (19,20)', gvcSelector: 'input[name="residence_address"], #residence_address', matchProp: 'residenceAddress' },
-      { fieldKey: 'residence_postal', label: '19.4 Postal Code *', type: 'text', required: true, stage: '5. Residence (19,20)', gvcSelector: 'input[name="residence_postal"], #residence_postal', matchProp: 'residencePostal' },
-      { fieldKey: 'residence_email', label: '19.5 Email Address *', type: 'email', required: true, stage: '5. Residence (19,20)', gvcSelector: 'input[name="residence_email"], #residence_email', matchProp: 'residenceEmail' },
-      { fieldKey: 'residence_phone', label: '19.6 Phone Number *', type: 'tel', required: true, stage: '5. Residence (19,20)', gvcSelector: 'input[name="residence_phone"], #residence_phone', matchProp: 'residencePhone' },
-      { fieldKey: 'residence_mobile', label: '19.7 Mobile Number', type: 'tel', required: false, stage: '5. Residence (19,20)', gvcSelector: 'input[name="residence_mobile"], #residence_mobile', matchProp: 'residenceMobile' },
-      { fieldKey: 'courier_same_address', label: 'Same Address for Courier Delivery?', type: 'select', required: true, options: ['Yes', 'No'], stage: '5. Residence (19,20)', gvcSelector: 'select[name="courier_same"], #courier_same', matchProp: 'courierSameAddress' },
-      { fieldKey: 'residence_other_country_name', label: '20.1 Country (Residence in Country Other than Current Nationality)', type: 'select', required: false, stage: '5. Residence (19,20)', gvcSelector: 'select[name="residence_other_country"], #residence_other_country', matchProp: 'residenceOtherCountryName' },
-
-      // Section 6: Occupation or School (21,22) - [Live Screenshot 3]
-      { fieldKey: 'occupation', label: '21. Current Occupation *', type: 'select', required: true, stage: '6. Occupation or School (21,22)', gvcSelector: 'select[name="occupation"], #occupation', matchProp: 'occupation' },
-      { fieldKey: 'employer_name', label: "22.1 Employer's or School's Name *", type: 'text', required: true, stage: '6. Occupation or School (21,22)', gvcSelector: 'input[name="employer_name"], #employer_name', matchProp: 'employerName' },
-      { fieldKey: 'employer_street', label: "22.2 Employer's or School's Street Address *", type: 'text', required: true, stage: '6. Occupation or School (21,22)', gvcSelector: 'input[name="employer_street"], #employer_street', matchProp: 'employerStreet' },
-      { fieldKey: 'employer_postal', label: "22.3 Employer's or School's Postal Code *", type: 'text', required: true, stage: '6. Occupation or School (21,22)', gvcSelector: 'input[name="employer_postal"], #employer_postal', matchProp: 'employerPostal' },
-      { fieldKey: 'employer_city', label: "22.4 Employer's or School's City *", type: 'text', required: true, stage: '6. Occupation or School (21,22)', gvcSelector: 'input[name="employer_city"], #employer_city', matchProp: 'employerCity' },
-      { fieldKey: 'employer_country', label: "22.5 Employer's or School's Country *", type: 'select', required: true, options: ['PAKISTAN'], stage: '6. Occupation or School (21,22)', gvcSelector: 'select[name="employer_country"], #employer_country', matchProp: 'employerCountry' },
-
-      // Section 7: Travel Information (23-27) - [Live Screenshots 1 & 2]
-      { fieldKey: 'vac', label: 'Visa Application Centre (VAC)', type: 'select', required: true, options: ['Islamabad VAC', 'Lahore VAC', 'Karachi VAC'], stage: '7. Travel Information (23-27)', gvcSelector: 'select[name="vac_id"], #vac_id', matchProp: 'vac' },
-      { fieldKey: 'category', label: 'Appointment for (Visa Category)', type: 'select', required: true, options: ['Submission Schengen Visa (Short term – Type C)', 'National visa (Long term - type D)', 'Prime Time (optional service at an additional charge)', 'Long-Term Type D (Seasonal/Dependent Employment)'], stage: '7. Travel Information (23-27)', gvcSelector: 'select[name="category_id"], #category_id', matchProp: 'category' },
-      { fieldKey: 'travel_purpose', label: '23.1 Main Purpose(s) of Journey - Travel Purpose *', type: 'select', required: true, options: ['TOURISM', 'BUSINESS', 'WORK', 'STUDY', 'FAMILY VISIT'], stage: '7. Travel Information (23-27)', gvcSelector: 'select[name="travel_purpose"], #travel_purpose', matchProp: 'travelPurpose' },
-      { fieldKey: 'other_purpose', label: '23.2.1 Other Purpose 1', type: 'text', required: false, stage: '7. Travel Information (23-27)', gvcSelector: 'input[name="other_purpose"], #other_purpose', matchProp: 'otherPurpose' },
-      { fieldKey: 'purpose_additional_info', label: '24. Additional Information on Purpose of Stay', type: 'text', required: false, stage: '7. Travel Information (23-27)', gvcSelector: 'textarea[name="purpose_info"], #purpose_info', matchProp: 'purposeAdditionalInfo' },
-      { fieldKey: 'destination_state_1', label: '25.1 Member State 1 *', type: 'select', required: true, options: ['GREECE'], stage: '7. Travel Information (23-27)', gvcSelector: 'select[name="destination_state_1"], #destination_state_1', matchProp: 'destinationState1' },
-      { fieldKey: 'destination_state_2', label: '25.2 Member State 2', type: 'text', required: false, stage: '7. Travel Information (23-27)', gvcSelector: 'input[name="destination_state_2"], #destination_state_2', matchProp: 'destinationState2' },
-      { fieldKey: 'first_entry_state', label: '26. Member State of First Entry *', type: 'select', required: true, options: ['GREECE'], stage: '7. Travel Information (23-27)', gvcSelector: 'select[name="first_entry_state"], #first_entry_state', matchProp: 'firstEntryState' },
-      { fieldKey: 'entries_requested', label: '27. Number of Entries Requested *', type: 'select', required: true, options: ['SINGLE', 'TWO', 'MULTIPLE'], stage: '7. Travel Information (23-27)', gvcSelector: 'select[name="entries_requested"], #entries_requested', matchProp: 'entriesRequested' },
-      { fieldKey: 'intended_arrival_date', label: '27.0 Intended Date of First Arrival (dd/mm/yyyy) *', type: 'date', required: true, stage: '7. Travel Information (23-27)', gvcSelector: 'input[name="intended_arrival"], #intended_arrival', matchProp: 'intendedArrivalDate' },
-      { fieldKey: 'intended_departure_date', label: '27.1 Intended Date of Departure (dd/mm/yyyy) *', type: 'date', required: true, stage: '7. Travel Information (23-27)', gvcSelector: 'input[name="intended_departure"], #intended_departure', matchProp: 'intendedDepartureDate' },
-      { fieldKey: 'duration_of_stay_days', label: '27.2 Duration of the Intended Stay (in days) *', type: 'number', required: true, stage: '7. Travel Information (23-27)', gvcSelector: 'input[name="duration_days"], #duration_days', matchProp: 'durationOfStayDays' },
-
-      // Section 8: Previous Visas & Permits (28,29)
-      { fieldKey: 'fingerprints_collected', label: '28. Fingerprints Collected Previously for Schengen Visa', type: 'select', required: true, options: ['No', 'Yes'], stage: '8. Previous Visas & Permits (28,29)', gvcSelector: 'select[name="fingerprints"], #fingerprints', matchProp: 'fingerprintsCollected' },
-      { fieldKey: 'entry_permit_final', label: '29. Entry Permit for Final Destination (if applicable)', type: 'select', required: true, options: ['N/A', 'Yes', 'No'], stage: '8. Previous Visas & Permits (28,29)', gvcSelector: 'select[name="entry_permit"], #entry_permit', matchProp: 'entryPermitFinal' },
-
-      // Section 9: Hosting (30,31)
-      { fieldKey: 'host_info', label: '30,31. Inviting Person / Host Name, Address, Email & Tel', type: 'text', required: true, stage: '9. Hosting (30,31)', gvcSelector: 'input[name="host_info"], #host_info', matchProp: 'hostInfo' },
-
-      // Section 10: Accommodation (30.2)
-      { fieldKey: 'hotel_name', label: '30.2.1 Hotel/Accommodation Name *', type: 'text', required: true, stage: '10. Accommodation (30.2)', gvcSelector: 'input[name="hotel_name"], #hotel_name', matchProp: 'hotelName' },
-      { fieldKey: 'hotel_street', label: '30.2.2 Street *', type: 'text', required: true, stage: '10. Accommodation (30.2)', gvcSelector: 'input[name="hotel_street"], #hotel_street', matchProp: 'hotelStreet' },
-      { fieldKey: 'hotel_city', label: '30.2.3 City *', type: 'text', required: true, stage: '10. Accommodation (30.2)', gvcSelector: 'input[name="hotel_city"], #hotel_city', matchProp: 'hotelCity' },
-      { fieldKey: 'hotel_postal', label: '30.2.4 Postal Code *', type: 'text', required: true, stage: '10. Accommodation (30.2)', gvcSelector: 'input[name="hotel_postal"], #hotel_postal', matchProp: 'hotelPostal' },
-      { fieldKey: 'hotel_email', label: '30.2.5 Email Address', type: 'email', required: false, stage: '10. Accommodation (30.2)', gvcSelector: 'input[name="hotel_email"], #hotel_email', matchProp: 'hotelEmail' },
-      { fieldKey: 'hotel_phone', label: '30.2.6 Phone Number *', type: 'tel', required: true, stage: '10. Accommodation (30.2)', gvcSelector: 'input[name="hotel_phone"], #hotel_phone', matchProp: 'hotelPhone' },
-
-      // Section 11: Cost of Travelling (32)
-      { fieldKey: 'travel_cost_covered_by', label: '32. Cost of Travelling Covered By', type: 'select', required: true, options: ['Applicant himself', 'Sponsor / Host', 'Other'], stage: '11. Cost of Travelling (32)', gvcSelector: 'select[name="cost_by"], #cost_by', matchProp: 'travelCostCoveredBy' },
-
-      // Section 12: Person Filling (33)
-      { fieldKey: 'person_filling', label: '33. Person Filling Application', type: 'select', required: true, options: ['Applicant Himself', 'Representative / Agency'], stage: '12. Person Filling (33)', gvcSelector: 'select[name="person_filling"], #person_filling', matchProp: 'personFilling' },
-
-      // Section 13: Travel Medical Insurance (33)
-      { fieldKey: 'insurance_declaration', label: '33. 30,000 EUR Compliant Travel Medical Insurance Declaration', type: 'select', required: true, options: ['Yes - I have 100% compliant Schengen insurance'], stage: '13. Travel Medical Insurance (33)', gvcSelector: 'select[name="insurance_declaration"], #insurance_declaration', matchProp: 'insuranceDeclaration' },
-      { fieldKey: 'accuracy_confirmation', label: 'Accuracy Verification Checkbox', type: 'checkbox', required: true, stage: '13. Travel Medical Insurance (33)', gvcSelector: 'input[type="checkbox"]', matchProp: 'accuracyConfirmation' },
-
-      // Contact & OTP Details
-      { fieldKey: 'phone', label: 'Mobile Phone Number (for SMS OTP)', type: 'tel', required: true, stage: 'Contact & OTP Details', gvcSelector: 'input[name="phone"], #phone', matchProp: 'phone' },
-      { fieldKey: 'email', label: 'Email Address (for Confirmation & OTP)', type: 'email', required: true, stage: 'Contact & OTP Details', gvcSelector: 'input[name="email"], #email', matchProp: 'email' }
+      // Appointment Schedule
+      { fieldKey: 'intended_arrival_date', label: 'Appointment Date', type: 'date', required: true, stage: 'Appointment Schedule', gvcSelector: 'input[name="appointment_date"], #appointment_date', matchProp: 'intendedArrivalDate' }
     ];
 
     this.lastScrapedFormFields = null;
@@ -518,7 +449,7 @@ class MonitorAgent extends EventEmitter {
       { id: 1, name: 'Stage 1: Gateway Session & WAF Shield', status: isWaf ? 'SHIELD_ACTIVE' : 'CLEARED', note: isWaf ? 'Imperva WAF shield active. Requires main site session cookies.' : 'Gateway connection verified.' },
       { id: 2, name: 'Stage 2: Portal User Authentication', status: filledCount > 0 ? 'CLEARED' : (isWaf ? 'READY_IN_QUEUE' : 'CLEARED'), note: `Login credentials (${username}) loaded & mapped.` },
       { id: 3, name: 'Stage 3: Centre & Category Matching', status: 'CLEARED', note: `${applicant.vac || 'Islamabad VAC'} | ${applicant.category || 'Short Stay Schengen (Type C)'}` },
-      { id: 4, name: 'Stage 4: 33-Field Applicant Profile Pre-Fill', status: 'CLEARED', note: `${prefilledCount}/${schema.fields.length} Fields Mapped (${autofillMatchRate}% Match Rate across 13 Portal Sections).` },
+      { id: 4, name: 'Stage 4: Appointment Form Fields Pre-Fill', status: 'CLEARED', note: `${prefilledCount}/${schema.fields.length} Compulsory Appointment Fields Mapped (${autofillMatchRate}% Match Rate).` },
       { id: 5, name: 'Stage 5: OTP / SMS Security Verification', status: 'ARMED_FOR_PROMPT', note: 'System will trigger interactive modal upon SMS code dispatch.' },
       { id: 6, name: 'Stage 6: Final Slot Confirmation', status: 'ARMED_FOR_SLOT', note: 'Queued for automatic submission upon slot availability.' }
     ];
