@@ -620,9 +620,12 @@ app.get('/api/applications/confirmed-bookings', async (req, res) => {
 
 // Start Express Server (when run standalone)
 if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
-  app.listen(PORT, () => {
+  const HOST = process.env.HOST || '0.0.0.0';
+  app.listen(PORT, HOST, () => {
     console.log(`\n==================================================`);
-    console.log(`GVC World Portal Running with Neon PostgreSQL on http://localhost:${PORT}`);
+    console.log(`GVC World Portal Server Active`);
+    console.log(`- Local Access:   http://localhost:${PORT}`);
+    console.log(`- Network Access: http://0.0.0.0:${PORT}`);
     console.log(`==================================================\n`);
 
     agent.start();
