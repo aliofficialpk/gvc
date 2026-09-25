@@ -8,7 +8,7 @@ class MonitorAgent extends EventEmitter {
     super();
     this.isMonitoring = false;
     this.timer = null;
-    this.checkIntervalMs = 120000; // 2 minutes default
+    this.checkIntervalMs = 1800000; // 30 minutes default (1800s)
     this.lastCheck = null;
     this.lastScrapedSnapshot = null;
     this.scanCount = 0;

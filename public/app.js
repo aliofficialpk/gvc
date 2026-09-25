@@ -4,7 +4,7 @@ let state = {
   activeTab: 'monitor',
   historySubTab: 'all',
   isMonitoring: false,
-  checkIntervalSeconds: 120,
+  checkIntervalSeconds: 1800,
   scanCount: 0,
   lastCheck: null,
   detectedSlots: [],
@@ -13,7 +13,7 @@ let state = {
   formSchema: null,
   soundEnabled: true,
   audioCtx: null,
-  countdownSeconds: 120
+  countdownSeconds: 1800
 };
 
 document.addEventListener('DOMContentLoaded', () => {
