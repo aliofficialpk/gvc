@@ -202,6 +202,33 @@ class MonitorAgent extends EventEmitter {
     this.addLog('SYSTEM', `Check frequency updated to ${seconds}s.`);
   }
 
+  async bootstrapGatewaySession(context) {
+    const gatewayPage = await context.newPage();
+    try {
+      await gatewayPage.goto('https://www.gvcworld.eu/', { waitUntil: 'domcontentloaded', timeout: 25000 });
+
+      await gatewayPage.waitForSelector('#edit-gvcw-greece', { timeout: 10000 }).catch(() => {});
+      await gatewayPage.selectOption('#edit-gvcw-greece', '2').catch(() => {});
+
+      // The country select options are refreshed after selecting visiting country.
+      await gatewayPage.waitForTimeout(1200);
+      await gatewayPage.selectOption('#gvcw_countries', '29').catch(() => {});
+
+      const popupPromise = gatewayPage.waitForEvent('popup', { timeout: 15000 }).catch(() => null);
+      await gatewayPage.click('#gvcw_countries_submit').catch(() => {});
+      const popup = await popupPromise;
+
+      if (popup) {
+        await popup.waitForLoadState('domcontentloaded', { timeout: 20000 }).catch(() => {});
+        await popup.close().catch(() => {});
+      }
+    } catch (_) {
+      // Gateway bootstrap is best effort; direct probe still runs afterward.
+    } finally {
+      await gatewayPage.close().catch(() => {});
+    }
+  }
+
   async runScan() {
     this.scanCount++;
     const scanId = `#${this.scanCount}`;
@@ -229,6 +256,7 @@ class MonitorAgent extends EventEmitter {
         Object.defineProperty(navigator, 'webdriver', { get: () => false });
       });
 
+      await this.bootstrapGatewaySession(context);
       const page = await context.newPage();
 
       // Probe main login entry
@@ -425,10 +453,8 @@ class MonitorAgent extends EventEmitter {
 
       const page = await context.newPage();
 
-      // Step 1: Initial Gateway Visit to get session cookies
-      try {
-        await page.goto('https://www.gvcworld.eu/', { waitUntil: 'domcontentloaded', timeout: 15000 });
-      } catch(e) {}
+      // Step 1: Gateway routing bootstrap to establish required cookies.
+      await this.bootstrapGatewaySession(context);
 
       // Step 2: Direct Login Navigation
       const loginRes = await page.goto(this.targetUrl, { waitUntil: 'domcontentloaded', timeout: 25000 });
