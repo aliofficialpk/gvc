@@ -15,6 +15,10 @@ class MonitorAgent extends EventEmitter {
     this.logs = [];
     this.detectedSlots = [];
     this.pool = null;
+    this.consecutiveWafHits = 0;
+    this.wafCooldownUntil = 0;
+    this.baseWafCooldownMs = 120000;
+    this.maxWafCooldownMs = 900000;
 
     this.targetUrl = 'https://pk-gr-services.gvcworld.eu/login/PK/en?lang=en_US';
     this.registerUrl = 'https://pk-gr-services.gvcworld.eu/register/PK/en?lang=en_US';
@@ -202,6 +206,32 @@ class MonitorAgent extends EventEmitter {
     this.addLog('SYSTEM', `Check frequency updated to ${seconds}s.`);
   }
 
+  async humanPause(page, minMs = 600, maxMs = 1600) {
+    const delayMs = minMs + Math.floor(Math.random() * (maxMs - minMs + 1));
+    if (page && typeof page.waitForTimeout === 'function') {
+      await page.waitForTimeout(delayMs);
+    } else {
+      await new Promise(resolve => setTimeout(resolve, delayMs));
+    }
+    return delayMs;
+  }
+
+  setWafCooldown() {
+    this.consecutiveWafHits += 1;
+    const cooldownMs = Math.min(this.maxWafCooldownMs, this.baseWafCooldownMs * this.consecutiveWafHits);
+    this.wafCooldownUntil = Date.now() + cooldownMs;
+    return cooldownMs;
+  }
+
+  resetWafCooldown() {
+    this.consecutiveWafHits = 0;
+    this.wafCooldownUntil = 0;
+  }
+
+  getWafCooldownSecondsRemaining() {
+    return Math.max(0, Math.ceil((this.wafCooldownUntil - Date.now()) / 1000));
+  }
+
   async bootstrapGatewaySession(context) {
     const gatewayPage = await context.newPage();
     try {
@@ -211,7 +241,7 @@ class MonitorAgent extends EventEmitter {
       await gatewayPage.selectOption('#edit-gvcw-greece', '2').catch(() => {});
 
       // The country select options are refreshed after selecting visiting country.
-      await gatewayPage.waitForTimeout(1200);
+      await this.humanPause(gatewayPage, 900, 1800);
       await gatewayPage.selectOption('#gvcw_countries', '29').catch(() => {});
 
       const popupPromise = gatewayPage.waitForEvent('popup', { timeout: 15000 }).catch(() => null);
@@ -234,6 +264,25 @@ class MonitorAgent extends EventEmitter {
     const scanId = `#${this.scanCount}`;
     const startTime = Date.now();
     this.addLog('SCAN', `Executing live check ${scanId}...`);
+
+    const cooldownSeconds = this.getWafCooldownSecondsRemaining();
+    if (cooldownSeconds > 0) {
+      this.lastCheck = {
+        scanId,
+        timestamp: new Date().toISOString(),
+        durationMs: 0,
+        httpStatus: this.lastCheck?.httpStatus || 0,
+        isPortalOnline: false,
+        isRegistrationOpen: false,
+        isWafChallenge: true,
+        isError17: true,
+        wafCooldownSecondsRemaining: cooldownSeconds,
+        cooldownActive: true
+      };
+      this.addLog('WAF', `Cooldown active after firewall restriction. Next compliant retry in ${cooldownSeconds}s.`, this.lastCheck);
+      this.emit('status', this.lastCheck);
+      return this.lastCheck;
+    }
 
     let browser = null;
     try {
@@ -258,6 +307,7 @@ class MonitorAgent extends EventEmitter {
 
       await this.bootstrapGatewaySession(context);
       const page = await context.newPage();
+      await this.humanPause(page, 700, 1600);
 
       // Probe main login entry
       const response = await page.goto(this.targetUrl, { waitUntil: 'domcontentloaded', timeout: 25000 });
@@ -275,6 +325,7 @@ class MonitorAgent extends EventEmitter {
       let regTitle = '';
       let regContent = '';
       try {
+        await this.humanPause(page, 600, 1400);
         const regRes = await page.goto(this.registerUrl, { waitUntil: 'domcontentloaded', timeout: 15000 });
         regStatus = regRes ? regRes.status() : 0;
         regTitle = await page.title();
@@ -298,7 +349,8 @@ class MonitorAgent extends EventEmitter {
         isPortalOnline,
         isRegistrationOpen,
         isWafChallenge,
-        isError17: isError17 || isRegError17
+        isError17: isError17 || isRegError17,
+        wafCooldownSecondsRemaining: 0
       };
 
       this.lastScrapedSnapshot = snapshot;
@@ -316,6 +368,7 @@ class MonitorAgent extends EventEmitter {
       }
 
       if (isRegistrationOpen) {
+        this.resetWafCooldown();
         const newSlot = {
           id: 'SLOT-' + Date.now(),
           timestamp: new Date().toISOString(),
@@ -338,10 +391,15 @@ class MonitorAgent extends EventEmitter {
         this.addLog('SLOT', `🎉 SLOT DETECTED! GVC World registration is open (${regTitle})`, newSlot);
         this.emit('slot', newSlot);
       } else if (isError17 || isRegError17) {
-        this.addLog('WAF', `Imperva Error 17 Blocked direct link (HTTP ${status}). Official gateway routing required.`, snapshot);
+        const cooldownSetMs = this.setWafCooldown();
+        snapshot.wafCooldownSecondsRemaining = Math.ceil(cooldownSetMs / 1000);
+        this.addLog('WAF', `Imperva Error 17 restricted request (HTTP ${status}). Backing off for ${snapshot.wafCooldownSecondsRemaining}s before next retry.`, snapshot);
       } else if (isWafChallenge) {
-        this.addLog('WAF', `Imperva Security Active (HTTP ${status}). Probe completed in ${durationMs}ms.`, snapshot);
+        const cooldownSetMs = this.setWafCooldown();
+        snapshot.wafCooldownSecondsRemaining = Math.ceil(cooldownSetMs / 1000);
+        this.addLog('WAF', `Imperva security challenge detected (HTTP ${status}). Backing off for ${snapshot.wafCooldownSecondsRemaining}s.`, snapshot);
       } else {
+        this.resetWafCooldown();
         this.addLog('SCAN', `Check ${scanId} complete. Status: HTTP ${status}, Response Time: ${durationMs}ms.`, snapshot);
       }
 
@@ -455,6 +513,7 @@ class MonitorAgent extends EventEmitter {
 
       // Step 1: Gateway routing bootstrap to establish required cookies.
       await this.bootstrapGatewaySession(context);
+      await this.humanPause(page, 700, 1600);
 
       // Step 2: Direct Login Navigation
       const loginRes = await page.goto(this.targetUrl, { waitUntil: 'domcontentloaded', timeout: 25000 });
